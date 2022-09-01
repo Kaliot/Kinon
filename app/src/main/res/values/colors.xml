@@ -7,4 +7,10 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="cadet_grey">#949fb1</color>
+    <color name="puce">#d48d99</color>
+    <color name="shadow">#000000</color>
+    <color name="gainsboro">#e2d9e4</color>
+    <color name="granite_gray">#616161</color>
+    <color name="auro_metal_saurus">#767384</color>
 </resources>

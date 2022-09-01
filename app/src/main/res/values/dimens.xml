@@ -14,4 +14,5 @@
     <dimen name="bottom_menu_height">70dp</dimen>
     <dimen name="btn_margin_top">15dp</dimen>
     <dimen name="btn_margin_bottom">15dp</dimen>
+    <dimen name="corners_radius">15dp</dimen>
 </resources>

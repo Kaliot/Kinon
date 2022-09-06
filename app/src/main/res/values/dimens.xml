@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="posters_height">160dp</dimen>
+    <dimen name="poster_card_margin">5dp</dimen>
+    <dimen name="poster_card_elevation">5dp</dimen>
+    <dimen name="poster_card_radius">10dp</dimen>
+    <dimen name="disclaimer_margin_top">16dp</dimen>
+    <dimen name="disclaimer_margin_end">16dp</dimen>
+    <dimen name="menu_buttons_margin_start">55dp</dimen>
+    <dimen name="menu_buttons_margin_top">45dp</dimen>
+    <dimen name="menu_buttons_margin_end">55dp</dimen>
+    <dimen name="menu_buttons_margin_bottom">45dp</dimen>
+    <dimen name="top_menu_height">70dp</dimen>
+    <dimen name="bottom_menu_height">70dp</dimen>
+    <dimen name="btn_margin_top">15dp</dimen>
+    <dimen name="btn_margin_bottom">15dp</dimen>
+    <dimen name="corners_radius">15dp</dimen>
+</resources>

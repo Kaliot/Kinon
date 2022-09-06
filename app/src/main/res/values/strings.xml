@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Kinon</string>
+    <string name="btn_search">Поиск</string>
+    <string name="disclaimer">Постеры представленны https://www.imdb.com/</string>
+    <string name="btn_new">Новинки</string>
+    <string name="btn_favorites">Избранное</string>
+    <string name="btn_recommended">Рекомендованное</string>
+    <string name="btn_settings">Настройки</string>
+    <string name="movie_title">The Invitation</string>
+    <string name="movie_title_2">Bullet Train</string>
+    <string name="movie_title_3">Beast</string>
+    <string name="movie_title_4">Top Gun: Maverick</string>
+    <string name="movie_title_5">Dragon Ball Super: Super Hero</string>
 </resources>

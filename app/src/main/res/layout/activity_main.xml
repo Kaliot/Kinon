@@ -4,8 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gainsboro"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    style="@style/activity_main_background">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/top_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:menu="@menu/top_app_bar"
+            app:navigationIcon="@drawable/ic_baseline_menu"
+            app:title="Kinon"
+            app:titleTextColor="@android:color/white" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
 
     <HorizontalScrollView
         android:id="@+id/scroll_posters"
@@ -24,89 +42,60 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/top_menu">
 
+
             <androidx.cardview.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/poster_card_margin"
-                android:layout_weight="1"
-                android:elevation="@dimen/poster_card_elevation"
-                app:cardCornerRadius="@dimen/poster_card_radius">
+                app:cardCornerRadius="@dimen/poster_card_radius"
+                style="@style/MyPosterCardView">
 
                 <ImageView
                     android:id="@+id/poster"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
+                    android:contentDescription="@string/movie_title"
                     app:srcCompat="@drawable/poster_1"
-                    android:contentDescription="@string/movie_title" />
+                    style="@style/MyPosterImageView" />
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/poster_card_margin"
-                android:layout_weight="1"
-                android:elevation="@dimen/poster_card_elevation"
-                app:cardCornerRadius="@dimen/poster_card_radius">
+                app:cardCornerRadius="@dimen/poster_card_radius"
+                style="@style/MyPosterCardView">
 
                 <ImageView
                     android:id="@+id/poster2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
+                    android:contentDescription="@string/movie_title_2"
                     app:srcCompat="@drawable/poster_2"
-                    android:contentDescription="@string/movie_title_2" />
+                    style="@style/MyPosterImageView" />
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/poster_card_margin"
-                android:layout_weight="1"
-                android:elevation="@dimen/poster_card_elevation"
-                app:cardCornerRadius="@dimen/poster_card_radius">
+                app:cardCornerRadius="@dimen/poster_card_radius"
+                style="@style/MyPosterCardView">
 
                 <ImageView
                     android:id="@+id/poster3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
+                    android:contentDescription="@string/movie_title_3"
                     app:srcCompat="@drawable/poster_3"
-                    android:contentDescription="@string/movie_title_3" />
+                    style="@style/MyPosterImageView" />
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/poster_card_margin"
-                android:layout_weight="1"
-                android:elevation="@dimen/poster_card_elevation"
-                app:cardCornerRadius="@dimen/poster_card_radius">
+                app:cardCornerRadius="@dimen/poster_card_radius"
+                style="@style/MyPosterCardView">
 
                 <ImageView
                     android:id="@+id/poster4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
+                    android:contentDescription="@string/movie_title_4"
                     app:srcCompat="@drawable/poster_4"
-                    android:contentDescription="@string/movie_title_4" />
+                    style="@style/MyPosterImageView" />
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/poster_card_margin"
-                android:layout_weight="1"
-                android:elevation="@dimen/poster_card_elevation"
-                app:cardCornerRadius="@dimen/poster_card_radius">
+                app:cardCornerRadius="@dimen/poster_card_radius"
+                style="@style/MyPosterCardView">
 
                 <ImageView
                     android:id="@+id/poster5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
+                    android:contentDescription="@string/movie_title_5"
                     app:srcCompat="@drawable/poster_5"
-                    android:contentDescription="@string/movie_title_5" />
+                    style="@style/MyPosterImageView" />
             </androidx.cardview.widget.CardView>
 
         </LinearLayout>
@@ -127,101 +116,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/scroll_posters" />
 
-    <LinearLayout
-        android:id="@+id/menu_buttons"
-        android:layout_width="0dp"
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/menu_buttons_margin_start"
-        android:layout_marginTop="@dimen/menu_buttons_margin_top"
-        android:layout_marginEnd="@dimen/menu_buttons_margin_end"
-        android:layout_marginBottom="@dimen/menu_buttons_margin_bottom"
-        android:background="@drawable/shape_menu"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@id/bottom_menu"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/disclaimer">
-
-        <Button
-            android:id="@+id/button_search"
-            android:background="?selectableItemBackgroundBorderless"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/btn_margin_top"
-            android:shadowColor="@color/shadow"
-            android:shadowDx="5"
-            android:shadowDy="5"
-            android:shadowRadius="5"
-            android:text="@string/btn_search"
-            android:textColor="@color/white"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/button_new"
-            android:background="?selectableItemBackgroundBorderless"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:shadowColor="@color/shadow"
-            android:shadowDx="5"
-            android:shadowDy="5"
-            android:shadowRadius="5"
-            android:text="@string/btn_new"
-            android:textColor="@color/white"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/button_favorites"
-            android:background="?selectableItemBackgroundBorderless"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:shadowColor="@color/shadow"
-            android:shadowDx="5"
-            android:shadowDy="5"
-            android:shadowRadius="5"
-            android:text="@string/btn_favorites"
-            android:textColor="@color/white"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/button_recommended"
-            android:background="?selectableItemBackgroundBorderless"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:shadowColor="@color/shadow"
-            android:shadowDx="5"
-            android:shadowDy="5"
-            android:shadowRadius="5"
-            android:text="@string/btn_recommended"
-            android:textColor="@color/white"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/button_settings"
-            android:background="?selectableItemBackgroundBorderless"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/btn_margin_bottom"
-            android:shadowColor="@color/shadow"
-            android:shadowDx="5"
-            android:shadowDy="5"
-            android:shadowRadius="5"
-            android:text="@string/btn_settings"
-            android:textColor="@color/white"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/top_menu"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/top_menu_height"
-        android:background="@color/auro_metal_saurus"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <FrameLayout
-        android:id="@+id/bottom_menu"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/bottom_menu_height"
-        android:background="#aaa8ab"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:itemTextColor="@android:color/white"
+        app:itemIconTint="@android:color/white"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/navigation_menu"
+        app:layout_constraintBottom_toBottomOf="parent"
+        style="@style/MyTheme.BottomNavigationView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

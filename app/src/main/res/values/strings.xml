@@ -11,4 +11,11 @@
     <string name="movie_title_3">Beast</string>
     <string name="movie_title_4">Top Gun: Maverick</string>
     <string name="movie_title_5">Dragon Ball Super: Super Hero</string>
+    <string name="poster_url">https://www.imdb.com/title/tt12873562/</string>
+    <string name="poster2_url">https://www.imdb.com/title/tt12593682/</string>
+    <string name="poster3_url">https://www.imdb.com/title/tt13223398/</string>
+    <string name="poster4_url">https://www.imdb.com/title/tt1745960/</string>
+    <string name="poster5_url">https://www.imdb.com/title/tt14614892/</string>
+    <string name="movie_title_gravity">Gravity</string>
+    <string name="poster_gravity_url">https://www.imdb.com/title/tt1454468/</string>
 </resources>

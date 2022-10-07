@@ -15,4 +15,20 @@
     <dimen name="btn_margin_top">15dp</dimen>
     <dimen name="btn_margin_bottom">15dp</dimen>
     <dimen name="corners_radius">15dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="app_bar_height">200dp</dimen>
+    <dimen name="app_bar_min_height">60dp</dimen>
+    <dimen name="nsv_margin">8dp</dimen>
+    <dimen name="main_RV_width">0dp</dimen>
+    <dimen name="main_RV_height">0dp</dimen>
+    <dimen name="main_RV_margin">16dp</dimen>
+    <dimen name="item_container_height">150dp</dimen>
+    <dimen name="item_container_elevation">1dp</dimen>
+    <dimen name="item_container_radius">10dp</dimen>
+    <dimen name="poster_width">150dp</dimen>
+    <dimen name="title_width">0dp</dimen>
+    <dimen name="title_padding">8dp</dimen>
+    <dimen name="description_width">0dp</dimen>
+    <dimen name="description_height">0dp</dimen>
+    <dimen name="description_padding">8dp</dimen>
 </resources>

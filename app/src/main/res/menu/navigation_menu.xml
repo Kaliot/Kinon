@@ -5,15 +5,15 @@
         android:id="@+id/new_titles"
         android:icon="@drawable/ic_baseline_new"
         android:title="@string/btn_new_titles"
-        app:showAsAction="withText"/>
+        app:showAsAction="withText" />
     <item
         android:id="@+id/favorites"
         android:icon="@drawable/ic_baseline_favorite"
         android:title="@string/btn_favorites"
-        app:showAsAction="withText"/>
+        app:showAsAction="withText" />
     <item
         android:id="@+id/recommended"
         android:icon="@drawable/ic_baseline_thumb_up_alt"
         android:title="@string/btn_recommended"
-        app:showAsAction="withText"/>
+        app:showAsAction="withText" />
 </menu>

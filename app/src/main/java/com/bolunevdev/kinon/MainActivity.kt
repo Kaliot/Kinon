@@ -12,18 +12,76 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bolunevdev.kinon.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var filmsDataBase: MutableList<Film>
+    private lateinit var filmsAdapter: FilmListRecyclerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+        filmsDataBase = arrayListOf(
+            Film(
+                getString(R.string.memento_title),
+                R.drawable.memento,
+                getString(R.string.memento_description)
+            ),
+            Film(
+                getString(R.string.inception_title),
+                R.drawable.inception,
+                getString(R.string.inception_description)
+            ),
+            Film(
+                getString(R.string.the_dark_knight_title),
+                R.drawable.the_dark_knight,
+                getString(R.string.the_dark_knight_description)
+            ),
+            Film(
+                getString(R.string.forrest_gump_title),
+                R.drawable.forrest_gump,
+                getString(R.string.forrest_gump_description)
+            ),
+            Film(
+                getString(R.string.pulp_fiction_title),
+                R.drawable.pulp_fiction,
+                getString(R.string.pulp_fiction_description)
+            ),
+            Film(
+                getString(R.string.the_matrix_title),
+                R.drawable.the_matrix,
+                getString(R.string.the_matrix_description)
+            ),
+            Film(
+                getString(R.string.interstellar_title),
+                R.drawable.interstellar,
+                getString(R.string.interstellar_description)
+            ),
+            Film(
+                getString(R.string.the_wolf_of_wall_street_title),
+                R.drawable.the_wolf_of_wall_street,
+                getString(R.string.the_wolf_of_wall_street_description)
+            ),
+            Film(
+                getString(R.string.american_beauty_title),
+                R.drawable.american_beauty,
+                getString(R.string.american_beauty_description)
+            ),
+            Film(
+                getString(R.string.fight_club_title),
+                R.drawable.fight_club,
+                getString(R.string.fight_club_description)
+            )
+        )
+        initRV()
+
 
         binding.poster.setOnClickListener {
             val browserIntent =
@@ -32,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.posterCardGravity.setOnClickListener {
-            binding.root.overlay.add(binding.posterCardGravity)
+            view.overlay.add(binding.posterCardGravity)
             binding.posterCardGravity.pivotX = binding.posterCardGravity.measuredWidth * .85f
             binding.posterCardGravity.pivotY = binding.posterCardGravity.measuredHeight * .15f
             binding.posterCardGravity2.visibility = VISIBLE
@@ -66,12 +124,12 @@ class MainActivity : AppCompatActivity() {
             )
 
             val animationUpdateListener = object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(p0: Animator?) {
+                override fun onAnimationRepeat(p0: Animator) {
                 }
 
-                override fun onAnimationEnd(p0: Animator?) {
+                override fun onAnimationEnd(p0: Animator) {
                     animator.removeListener(this)
-                    binding.root.overlay.clear()
+                    view.overlay.clear()
 
                     val appearance =
                         ObjectAnimator.ofFloat(binding.posterCardGravity2, View.ALPHA, 0f, 1f)
@@ -80,10 +138,10 @@ class MainActivity : AppCompatActivity() {
                     appearance.start()
                 }
 
-                override fun onAnimationCancel(p0: Animator?) {
+                override fun onAnimationCancel(p0: Animator) {
                 }
 
-                override fun onAnimationStart(p0: Animator?) {
+                override fun onAnimationStart(p0: Animator) {
                 }
             }
 
@@ -118,12 +176,12 @@ class MainActivity : AppCompatActivity() {
 
         binding.poster6.setOnClickListener {
             val browserIntent =
-                Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.poster2_url)))
+                Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.poster6_url)))
             startActivity(browserIntent)
         }
 
         binding.topAppBar.setNavigationOnClickListener {
-            Toast.makeText(this, "Меню", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.btn_menu), Toast.LENGTH_SHORT).show()
         }
 
         binding.topAppBar.setOnMenuItemClickListener {
@@ -153,5 +211,45 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun initRV() {
+//        находим наш RV
+        val recyclerView = binding.mainRecycler
+        recyclerView.apply {
+            //Инициализируем наш адаптер в конструктор передаем анонимно инициализированный интерфейс,
+            filmsAdapter =
+                FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
+                    override fun click(film: Film) {
+                        //Создаем бандл и кладем туда объект с данными фильма
+                        val bundle = Bundle()
+                        //Первым параметром указывается ключ, по которому потом будем искать, вторым сам
+                        //передаваемый объект
+                        bundle.putParcelable("film", film)
+                        //Запускаем наше активити
+                        val intent = Intent(this@MainActivity, DetailsActivity::class.java)
+                        //Прикрепляем бандл к интенту
+                        intent.putExtras(bundle)
+                        //Запускаем активити через интент
+                        startActivity(intent)
+                    }
+                })
+//            Присваиваем адаптер
+            recyclerView.adapter = filmsAdapter
+
+            //Присвоим layoutManager
+            val layoutManager = LinearLayoutManager(this@MainActivity)
+            recyclerView.layoutManager = layoutManager
+
+            //Применяем декоратор для отступов
+            val decorator = TopSpacingItemDecoration(8)
+            addItemDecoration(decorator)
+        }
+
+//        Кладем нашу БД в RV
+        val diff = FilmDiff(filmsAdapter.items, filmsDataBase)
+        val diffResult = DiffUtil.calculateDiff(diff)
+        filmsAdapter.items = filmsDataBase
+        diffResult.dispatchUpdatesTo(filmsAdapter)
     }
 }

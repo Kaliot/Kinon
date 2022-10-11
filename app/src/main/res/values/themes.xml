@@ -21,4 +21,8 @@
         <item name = "android:background"> @color/silver</item>
     </style>
 
+    <style name="MyTheme.FloatingActionButton" parent="Widget.Design.FloatingActionButton">
+        <item name = "android:backgroundTint"> @color/dark_liver</item>
+    </style>
+
 </resources>

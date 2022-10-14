@@ -1,16 +1,18 @@
 package com.bolunevdev.kinon
 
 
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bolunevdev.kinon.databinding.FilmItemBinding
 
 
-class FilmViewHolder(binding: FilmItemBinding) : RecyclerView.ViewHolder(binding.root) {
+class FilmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     //Привязываем View из layout к переменным
-    private val title = binding.title
-    private val poster = binding.poster
-    private val description = binding.description
+    private val title = itemView.findViewById<TextView>(R.id.title)
+    private val poster = itemView.findViewById<ImageView>(R.id.poster)
+    private val description = itemView.findViewById<TextView>(R.id.description)
 
     //В этом методе кладем данные из Film в наши View
     fun bind(film: Film) {

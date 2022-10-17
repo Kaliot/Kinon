@@ -27,7 +27,7 @@ class ExitMenuFragment : DialogFragment() {
             (requireActivity() as MainActivity).finish()
         }
         binding.btnN.setOnClickListener {
-            super.onDismiss(dialog!!)
+            dialog?.let { it1 -> super.onDismiss(it1) }
         }
     }
 }

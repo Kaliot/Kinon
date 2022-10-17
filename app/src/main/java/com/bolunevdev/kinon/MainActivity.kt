@@ -9,11 +9,12 @@ import com.bolunevdev.kinon.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
+    private val fragmentNum = 1
     private lateinit var binding: ActivityMainBinding
     private val onBackPressedCallback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if (supportFragmentManager.backStackEntryCount == 1)
-                ExitMenuFragment().show(supportFragmentManager, "dialog1")
+            if (supportFragmentManager.backStackEntryCount == fragmentNum)
+                ExitMenuFragment().show(supportFragmentManager, EXIT_MENU_DIALOG)
             else supportFragmentManager.popBackStack()
         }
     }
@@ -66,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         //Создаем "посылку"
         val bundle = Bundle()
         //Кладем наш фильм в "посылку"
-        bundle.putParcelable("film", film)
+        bundle.putParcelable(KEY_FILM_DETAILS_FRAGMENT, film)
         //Кладем фрагмент с деталями в перменную
         val fragment = DetailsFragment()
         //Прикрепляем нашу "посылку" к фрагменту
@@ -77,5 +78,11 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.fragment_placeholder, fragment)
             .addToBackStack(null)
             .commit()
+    }
+
+    companion object {
+        @JvmStatic private val EXIT_MENU_DIALOG = "dialog1"
+        @JvmStatic
+        val KEY_FILM_DETAILS_FRAGMENT = "film"
     }
 }

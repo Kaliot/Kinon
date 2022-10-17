@@ -33,7 +33,7 @@ class DetailsFragment : Fragment() {
 
     private fun setDetails(){
         //Получаем наш фильм из переданного бандла
-        val film = arguments?.get("film") as Film
+        val film = arguments?.get(MainActivity.KEY_FILM_DETAILS_FRAGMENT) as Film
 //        Устанавливаем заголовок
         binding.detailsToolbar.title = film.title
         //Устанавливаем картинку

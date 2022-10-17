@@ -1,6 +1,7 @@
 package com.bolunevdev.kinon
 
 import android.os.Parcelable
+//import kotlinx.android.parcel.Parcelize
 import kotlinx.parcelize.Parcelize
 
 
@@ -10,3 +11,6 @@ data class Film(
     val poster: Int,
     val description: String
 ) : Parcelable
+
+
+

@@ -42,4 +42,7 @@
     <string name="share_btn_desc">Share</string>
     <string name="btn_share">Поделиться</string>
     <string name="poster_description">Poster</string>
+    <string name="exit_menu_text_header">Вы хотите выйти?</string>
+    <string name="exit_menu_btn_y">Да</string>
+    <string name="exit_menu_btn_n">Нет</string>
 </resources>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HomeFragment">
+
+    <HorizontalScrollView
+        android:id="@+id/scroll_posters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/posters"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/posters_height"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/app_bar_layout">
+
+            <androidx.cardview.widget.CardView
+                style="@style/MyPosterCardView"
+                app:cardCornerRadius="@dimen/poster_card_radius">
+
+                <ImageView
+                    android:id="@+id/poster"
+                    style="@style/MyPosterImageView"
+                    android:contentDescription="@string/movie_title"
+                    app:srcCompat="@drawable/poster_1" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/poster_card_gravity"
+                style="@style/MyPosterCardView"
+                app:cardCornerRadius="@dimen/poster_card_radius">
+
+                <ImageView
+                    android:id="@+id/poster_gravity"
+                    style="@style/MyPosterImageView"
+                    android:contentDescription="@string/movie_title_gravity"
+                    app:srcCompat="@drawable/poster_gravity" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/poster_card_gravity_2"
+                style="@style/MyPosterCardView"
+                android:alpha="0"
+                android:visibility="gone"
+                app:cardCornerRadius="@dimen/poster_card_radius">
+
+                <ImageView
+                    android:id="@+id/poster_gravity_2"
+                    style="@style/MyPosterImageView"
+                    android:contentDescription="@string/movie_title_gravity"
+                    app:srcCompat="@drawable/poster_gravity" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                style="@style/MyPosterCardView"
+                app:cardCornerRadius="@dimen/poster_card_radius">
+
+                <ImageView
+                    android:id="@+id/poster3"
+                    style="@style/MyPosterImageView"
+                    android:contentDescription="@string/movie_title_3"
+                    app:srcCompat="@drawable/poster_3" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                style="@style/MyPosterCardView"
+                app:cardCornerRadius="@dimen/poster_card_radius">
+
+                <ImageView
+                    android:id="@+id/poster4"
+                    style="@style/MyPosterImageView"
+                    android:contentDescription="@string/movie_title_4"
+                    app:srcCompat="@drawable/poster_4" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                style="@style/MyPosterCardView"
+                app:cardCornerRadius="@dimen/poster_card_radius">
+
+                <ImageView
+                    android:id="@+id/poster5"
+                    style="@style/MyPosterImageView"
+                    android:contentDescription="@string/movie_title_5"
+                    app:srcCompat="@drawable/poster_5" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/poster_card_2"
+                style="@style/MyPosterCardView"
+                app:cardCornerRadius="@dimen/poster_card_radius">
+
+                <ImageView
+                    android:id="@+id/poster6"
+                    style="@style/MyPosterImageView"
+                    android:contentDescription="@string/movie_title_2"
+                    app:srcCompat="@drawable/poster_6" />
+            </androidx.cardview.widget.CardView>
+
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <TextView
+        android:id="@+id/disclaimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/disclaimer_margin_top"
+        android:layout_marginEnd="@dimen/disclaimer_margin_end"
+        android:autoLink="web"
+        android:linksClickable="true"
+        android:text="@string/disclaimer"
+        android:textColor="@color/granite_gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scroll_posters" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/main_recycler"
+        android:layout_width="@dimen/main_RV_width"
+        android:layout_height="@dimen/main_RV_height"
+        android:layout_margin="@dimen/main_RV_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/disclaimer"
+        tools:listitem="@layout/film_item" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

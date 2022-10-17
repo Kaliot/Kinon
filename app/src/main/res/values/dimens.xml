@@ -31,4 +31,6 @@
     <dimen name="description_width">0dp</dimen>
     <dimen name="description_height">0dp</dimen>
     <dimen name="description_padding">8dp</dimen>
+    <dimen name="exit_menu_text_header_textSize">25sp</dimen>
+    <dimen name="exit_menu_text_header_margin">20dp</dimen>
 </resources>

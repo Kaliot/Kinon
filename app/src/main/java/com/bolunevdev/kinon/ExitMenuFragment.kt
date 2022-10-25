@@ -16,12 +16,12 @@ class ExitMenuFragment : DialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentExitMenuBinding.inflate(inflater, container, false)
+        dialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         //Привязываем кнопки
         binding.btnY.setOnClickListener {
             (requireActivity() as MainActivity).finish()

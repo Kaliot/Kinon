@@ -105,7 +105,6 @@
                     app:srcCompat="@drawable/poster_6" />
             </androidx.cardview.widget.CardView>
 
-
         </LinearLayout>
 
     </HorizontalScrollView>

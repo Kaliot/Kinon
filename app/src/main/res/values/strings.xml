@@ -45,4 +45,8 @@
     <string name="exit_menu_text_header">Вы хотите выйти?</string>
     <string name="exit_menu_btn_y">Да</string>
     <string name="exit_menu_btn_n">Нет</string>
+    <string name="add_to_favorites_btn_desc">Add to favorites</string>
+    <string name="ShareTo">Поделиться:</string>
+    <string name="in_development">В разработке…</string>
+    <string name="CheckOutThisFilm">Взгляните на этот фильм:</string>
 </resources>

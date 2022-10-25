@@ -1,43 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    style="@style/activity_main_background"
-    android:orientation="vertical">
+    android:background="@drawable/shape_menu"
+    android:orientation="vertical"
+    tools:context=".ExitMenuFragment">
+
     <TextView
         android:id="@+id/text_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="@dimen/exit_menu_text_header_margin"
+        android:text="@string/exit_menu_text_header"
         android:textColor="@android:color/white"
-        android:textSize="@dimen/exit_menu_text_header_textSize"
-        android:text="@string/exit_menu_text_header">
-    </TextView>
+        android:textSize="@dimen/exit_menu_text_header_textSize" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <Button
             android:id="@+id/btn_y"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
-            android:layout_weight="50"
-            android:textColor="@color/white"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
+            android:layout_weight="50"
             android:text="@string/exit_menu_btn_y"
-            style="?android:attr/buttonBarButtonStyle">
-        </Button>
+            android:textColor="@color/white" />
+
         <Button
             android:id="@+id/btn_n"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
-            android:layout_weight="50"
-            android:textColor="@color/white"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
+            android:layout_weight="50"
             android:text="@string/exit_menu_btn_n"
-            style="?android:attr/buttonBarButtonStyle">
-        </Button>
+            android:textColor="@color/white" />
     </LinearLayout>
 </LinearLayout>

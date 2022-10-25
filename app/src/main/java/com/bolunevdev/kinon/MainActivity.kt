@@ -4,31 +4,41 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.*
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.bolunevdev.kinon.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity() {
 
-    private val fragmentNum = 1
     private lateinit var binding: ActivityMainBinding
-    private val onBackPressedCallback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            if (supportFragmentManager.backStackEntryCount == fragmentNum)
-                ExitMenuFragment().show(supportFragmentManager, EXIT_MENU_DIALOG)
-            else supportFragmentManager.popBackStack()
+    lateinit var navController: NavController
+    private lateinit var navHostFragment: NavHostFragment
+
+    private val onBackPressedCallback: OnBackPressedCallback =
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (navController.currentDestination == navController.findDestination(R.id.homeFragment))
+                    navController.navigate(R.id.action_homeFragment_to_exitMenuFragment)
+                else navController.popBackStack()
+            }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater).also { setContentView(it.root) }
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
-        supportFragmentManager
-            .beginTransaction()
-            .add(R.id.fragment_placeholder, HomeFragment())
-            .addToBackStack(null)
-            .commit()
+        createFilmsDataBase()
+        createFavoriteFilmsDataBase()
+
+        binding = ActivityMainBinding.inflate(layoutInflater).also { setContentView(it.root) }
+        navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_placeholder) as NavHostFragment
+        navController = navHostFragment.navController
+
+        binding.bottomNavigation.setupWithNavController(navController)
+
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         binding.topAppBar.setNavigationOnClickListener {
             Toast.makeText(this, getString(R.string.btn_menu), Toast.LENGTH_SHORT).show()
@@ -47,23 +57,17 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
-
-        binding.bottomNavigation.setOnItemReselectedListener {
-            when (it.itemId) {
-                R.id.new_titles -> {
-                    Toast.makeText(this, R.string.btn_new_titles, Toast.LENGTH_SHORT).show()
-                }
-                R.id.favorites -> {
-                    Toast.makeText(this, R.string.btn_favorites, Toast.LENGTH_SHORT).show()
-                }
-                R.id.recommended -> {
-                    Toast.makeText(this, R.string.btn_recommended, Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
     }
 
-    fun launchDetailsFragment(film: Film) {
+    private fun createFavoriteFilmsDataBase() {
+        favoriteFilms = FavoriteFilms(this, filmsDataBase)
+    }
+
+    private fun createFilmsDataBase() {
+        filmsDataBase = FilmsDataBase(this).getFilms()
+    }
+
+    fun launchDetailsFragment(film: Film, direction: Int) {
         //Создаем "посылку"
         val bundle = Bundle()
         //Кладем наш фильм в "посылку"
@@ -73,16 +77,14 @@ class MainActivity : AppCompatActivity() {
         //Прикрепляем нашу "посылку" к фрагменту
         fragment.arguments = bundle
         //Запускаем фрагмент
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.fragment_placeholder, fragment)
-            .addToBackStack(null)
-            .commit()
+        navController.navigate(direction, fragment.arguments)
     }
 
+
     companion object {
-        @JvmStatic private val EXIT_MENU_DIALOG = "dialog1"
-        @JvmStatic
-        val KEY_FILM_DETAILS_FRAGMENT = "film"
+        const val KEY_FILM_DETAILS_FRAGMENT = "film"
+        const val FAVORITE_FILMS_PREFERENCES = "FAVORITE_FILMS_PREFERENCES"
+        lateinit var filmsDataBase: MutableList<Film>
+        lateinit var favoriteFilms: FavoriteFilms
     }
 }

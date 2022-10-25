@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/homeFragment">
+
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.bolunevdev.kinon.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_detailsFragment"
+            app:destination="@id/detailsFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+        <action
+            android:id="@+id/action_homeFragment_to_exitMenuFragment"
+            app:destination="@id/exitMenuFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/detailsFragment"
+        android:name="com.bolunevdev.kinon.DetailsFragment"
+        android:label="fragment_details"
+        tools:layout="@layout/fragment_details"/>
+
+    <dialog
+        android:id="@+id/exitMenuFragment"
+        android:name="com.bolunevdev.kinon.ExitMenuFragment"
+        android:label="fragment_exit_menu"
+        tools:layout="@layout/fragment_exit_menu" />
+
+    <fragment
+        android:id="@+id/new_titles"
+        android:name="com.bolunevdev.kinon.NewTitlesFragment"
+        android:label="New_titles"
+        tools:layout="@layout/fragment_new_titles"/>
+
+    <fragment
+        android:id="@+id/favorites"
+        android:name="com.bolunevdev.kinon.FavoritesFragment"
+        android:label="Favorites"
+        tools:layout="@layout/fragment_favorites">
+        <action
+            android:id="@+id/action_favorites_to_detailsFragment"
+            app:destination="@id/detailsFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/recommended"
+        android:name="com.bolunevdev.kinon.RecommendedFragment"
+        android:label="Recommended"
+        tools:layout="@layout/fragment_recommended"/>
+
+</navigation>

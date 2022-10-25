@@ -33,4 +33,5 @@
     <dimen name="description_padding">8dp</dimen>
     <dimen name="exit_menu_text_header_textSize">25sp</dimen>
     <dimen name="exit_menu_text_header_margin">20dp</dimen>
+    <dimen name="in_development_text_size">20sp</dimen>
 </resources>

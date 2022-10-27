@@ -11,18 +11,18 @@
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
         <item name="windowNoTitle">true</item>
 
     </style>
 
     <style name="MyTheme.BottomNavigationView" parent="ThemeOverlay.MaterialComponents.Light">
-        <item name = "android:background"> @color/silver</item>
+        <item name="android:background">@color/silver</item>
     </style>
 
     <style name="MyTheme.FloatingActionButton" parent="Widget.Design.FloatingActionButton">
-        <item name = "android:backgroundTint"> @color/dark_liver</item>
+        <item name="android:backgroundTint">@color/dark_liver</item>
     </style>
 
 </resources>

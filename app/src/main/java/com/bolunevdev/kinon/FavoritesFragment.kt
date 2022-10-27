@@ -11,6 +11,7 @@ import com.bolunevdev.kinon.databinding.FragmentFavoritesBinding
 
 
 class FavoritesFragment : Fragment() {
+
     private lateinit var binding: FragmentFavoritesBinding
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
 
@@ -37,6 +38,10 @@ class FavoritesFragment : Fragment() {
                                 film,
                                 R.id.action_favorites_to_detailsFragment
                             )
+                        }
+                    }, object : FilmListRecyclerAdapter.OnItemLongClickListener {
+                        override fun longClick(film: Film) {
+                            (requireActivity() as MainActivity).copyFilmTitle(film)
                         }
                     })
                 //Присваиваем адаптер

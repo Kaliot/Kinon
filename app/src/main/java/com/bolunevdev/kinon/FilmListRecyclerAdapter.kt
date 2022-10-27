@@ -7,7 +7,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 
 //в параметр передаем слушатель, чтобы мы потом могли обрабатывать нажатия из класса Activity
-class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
+class FilmListRecyclerAdapter(
+
+    private val clickListener: OnItemClickListener,
+    private val longClickListener: OnItemLongClickListener
+) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     //Здесь у нас хранится список элементов для RV
@@ -42,6 +46,10 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
                 holder.itemView.findViewById<View>(R.id.item_container).setOnClickListener {
                     clickListener.click(items[position])
                 }
+                holder.itemView.findViewById<View>(R.id.item_container).setOnLongClickListener {
+                    longClickListener.longClick(items[position])
+                    return@setOnLongClickListener true
+                }
             }
         }
     }
@@ -49,6 +57,11 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
     //Интерфейс для обработки кликов
     interface OnItemClickListener {
         fun click(film: Film)
+    }
+
+    //Интерфейс для обработки длительного нажатия
+    interface OnItemLongClickListener {
+        fun longClick(film: Film)
     }
 }
 

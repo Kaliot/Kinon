@@ -1,10 +1,13 @@
 package com.bolunevdev.kinon
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.*
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.bolunevdev.kinon.databinding.ActivityMainBinding
@@ -15,6 +18,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     lateinit var navController: NavController
     private lateinit var navHostFragment: NavHostFragment
+    private lateinit var clipboardManager: ClipboardManager
 
     private val onBackPressedCallback: OnBackPressedCallback =
         object : OnBackPressedCallback(true) {
@@ -30,8 +34,10 @@ class MainActivity : AppCompatActivity() {
 
         createFilmsDataBase()
         createFavoriteFilmsDataBase()
+        clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
         binding = ActivityMainBinding.inflate(layoutInflater).also { setContentView(it.root) }
+
         navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_placeholder) as NavHostFragment
         navController = navHostFragment.navController
@@ -48,10 +54,6 @@ class MainActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.settings -> {
                     Toast.makeText(this, R.string.btn_settings, Toast.LENGTH_SHORT).show()
-                    true
-                }
-                R.id.search -> {
-                    Toast.makeText(this, R.string.btn_search, Toast.LENGTH_SHORT).show()
                     true
                 }
                 else -> false
@@ -80,10 +82,17 @@ class MainActivity : AppCompatActivity() {
         navController.navigate(direction, fragment.arguments)
     }
 
+    fun copyFilmTitle(film: Film) {
+        val clipData = ClipData.newPlainText(FILM_TITLE, film.title)
+        clipboardManager.setPrimaryClip(clipData)
+        Toast.makeText(this, getString(R.string.film_title_copied), Toast.LENGTH_SHORT).show()
+    }
+
 
     companion object {
         const val KEY_FILM_DETAILS_FRAGMENT = "film"
         const val FAVORITE_FILMS_PREFERENCES = "FAVORITE_FILMS_PREFERENCES"
+        const val FILM_TITLE = "FILM_TITLE"
         lateinit var filmsDataBase: MutableList<Film>
         lateinit var favoriteFilms: FavoriteFilms
     }

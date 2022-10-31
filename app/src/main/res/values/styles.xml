@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="MyPosterCardView">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:layout_margin">@dimen/poster_card_margin</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:elevation">@dimen/poster_card_elevation</item>
-    </style>
-
-    <style name="MyPosterImageView">
-        <item name="android:layout_width">100dp</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:scaleType">centerCrop</item>
-    </style>
-
     <style name="activity_main_background">
         <item name="android:background">@drawable/background</item>
     </style>

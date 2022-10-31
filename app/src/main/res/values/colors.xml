@@ -1,25 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="cadet_grey">#949fb1</color>
-    <color name="puce">#d48d99</color>
-    <color name="shadow">#000000</color>
     <color name="gainsboro">#e2d9e4</color>
-    <color name="granite_gray">#616161</color>
     <color name="auro_metal_saurus">#767384</color>
     <color name="pale_silver">#c6baba</color>
     <color name="dark_liver">#554A4B</color>
-    <color name="spanish_gray">#9a989b</color>
     <color name="silver">#aaa8ab</color>
     <color name="onyx">#353A3B</color>
     <color name="outer_space">#464D4E</color>
     <color name="eerie_black">#151A1B</color>
     <color name="wenge">#655A5B</color>
-    <!--    <color name="spanish_gray2">"@drawable/background"</color>-->
 </resources>

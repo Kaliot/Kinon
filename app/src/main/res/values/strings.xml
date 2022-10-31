@@ -1,23 +1,9 @@
 <resources>
     <string name="app_name">Kinon</string>
-    <string name="btn_search">Поиск</string>
-    <string name="disclaimer">Постеры предоставленны https://www.imdb.com/</string>
     <string name="btn_new_titles">Новинки</string>
     <string name="btn_favorites">Избранное</string>
     <string name="btn_recommended">Рекомендованное</string>
     <string name="btn_settings">Настройки</string>
-    <string name="movie_title">The Invitation</string>
-    <string name="movie_title_2">Bullet Train</string>
-    <string name="movie_title_3">Beast</string>
-    <string name="movie_title_4">Top Gun: Maverick</string>
-    <string name="movie_title_5">Dragon Ball Super: Super Hero</string>
-    <string name="poster_url">https://www.imdb.com/title/tt12873562/</string>
-    <string name="poster6_url">https://www.imdb.com/title/tt12593682/</string>
-    <string name="poster3_url">https://www.imdb.com/title/tt13223398/</string>
-    <string name="poster4_url">https://www.imdb.com/title/tt1745960/</string>
-    <string name="poster5_url">https://www.imdb.com/title/tt14614892/</string>
-    <string name="movie_title_gravity">Gravity</string>
-    <string name="poster_gravity_url">https://www.imdb.com/title/tt1454468/</string>
     <string name="memento_title">Memento</string>
     <string name="memento_description">A man with short-term memory loss attempts to track down his wife\'s murderer.</string>
     <string name="inception_title">Inception</string>
@@ -40,7 +26,6 @@
     <string name="fight_club_description">An insomniac office worker and a devil-may-care soap maker form an underground fight club that evolves into much more.</string>
     <string name="btn_menu">Меню</string>
     <string name="share_btn_desc">Share</string>
-    <string name="btn_share">Поделиться</string>
     <string name="poster_description">Poster</string>
     <string name="exit_menu_text_header">Вы хотите выйти?</string>
     <string name="exit_menu_btn_y">Да</string>
@@ -49,4 +34,6 @@
     <string name="ShareTo">Поделиться:</string>
     <string name="in_development">В разработке…</string>
     <string name="CheckOutThisFilm">Взгляните на этот фильм:</string>
+    <string name="film_title_copied">Название фильма скопировано</string>
+    <string name="home_search_view_hint">Введите название фильма…</string>
 </resources>

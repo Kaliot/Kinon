@@ -1,16 +1,16 @@
 package com.bolunevdev.kinon
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 
 //в параметр передаем слушатель, чтобы мы потом могли обрабатывать нажатия из класса Activity
 class FilmListRecyclerAdapter(
-
     private val clickListener: OnItemClickListener,
-    private val longClickListener: OnItemLongClickListener
+    private val longClickListener: OnItemLongClickListener,
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -37,26 +37,20 @@ class FilmListRecyclerAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is FilmViewHolder -> {
+                ViewCompat.setTransitionName(
+                    holder.itemView.findViewById(R.id.poster),
+                    items[position].poster.toString()
+                )
                 //Вызываем метод bind(), который мы создали, и передаем туда объект
                 //из нашей базы данных с указанием позиции
-                holder.bind(items[position])
-                //Обрабатываем нажатие на весь элемент целиком(можно сделать на отдельный элемент
-                //например, картинку) и вызываем метод нашего листенера, который мы получаем из
-                //конструктора адаптера
-                holder.itemView.findViewById<View>(R.id.item_container).setOnClickListener {
-                    clickListener.click(items[position])
-                }
-                holder.itemView.findViewById<View>(R.id.item_container).setOnLongClickListener {
-                    longClickListener.longClick(items[position])
-                    return@setOnLongClickListener true
-                }
+                holder.bind(items[position], clickListener, longClickListener)
             }
         }
     }
 
     //Интерфейс для обработки кликов
     interface OnItemClickListener {
-        fun click(film: Film)
+        fun click(film: Film, poster: ImageView)
     }
 
     //Интерфейс для обработки длительного нажатия

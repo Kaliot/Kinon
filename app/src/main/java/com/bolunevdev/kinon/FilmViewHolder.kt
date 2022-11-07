@@ -4,7 +4,12 @@ package com.bolunevdev.kinon
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.Fade
+import androidx.transition.TransitionSet
+import com.bumptech.glide.Glide
 
 
 class FilmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -15,12 +20,46 @@ class FilmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val description = itemView.findViewById<TextView>(R.id.description)
 
     //В этом методе кладем данные из Film в наши View
-    fun bind(film: Film) {
+    fun bind(
+        film: Film,
+        clickListener: FilmListRecyclerAdapter.OnItemClickListener,
+        longClickListener: FilmListRecyclerAdapter.OnItemLongClickListener
+    ) {
         //Устанавливаем заголовок
         title.text = film.title
         //Устанавливаем постер
-        poster.setImageResource(film.poster)
+        Glide.with(itemView)
+            //Загружаем сам ресурс
+            .load(film.poster)
+            //Центруем изображение
+            .centerCrop()
+            //Указываем ImageView, куда будем загружать изображение
+            .into(poster)
         //Устанавливаем описание
         description.text = film.description
+
+        //Обрабатываем нажатие на весь элемент целиком(можно сделать на отдельный элемент
+        //например, картинку) и вызываем метод нашего листенера, который мы получаем из
+        //конструктора адаптера
+        itemView.findViewById<View>(R.id.item_container).setOnClickListener {
+            it.findFragment<Fragment>().exitTransition = TransitionSet().apply {
+                addTransition(
+                    Fade(Fade.OUT)
+                        .setDuration(MainActivity.TRANSITION_DURATION)
+                        .excludeTarget(it, true)
+                )
+                addTransition(
+                    Fade(Fade.OUT)
+                        .addTarget(it)
+                        .setDuration(MainActivity.TRANSITION_DURATION_FAST)
+                )
+            }
+            clickListener.click(film, poster)
+        }
+
+        itemView.findViewById<View>(R.id.item_container).setOnLongClickListener {
+            longClickListener.longClick(film)
+            return@setOnLongClickListener true
+        }
     }
 }

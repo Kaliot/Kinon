@@ -9,8 +9,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.transition.Fade
+import androidx.transition.TransitionInflater
 import com.bolunevdev.kinon.databinding.FragmentDetailsBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
 
 
 class DetailsFragment : Fragment() {
@@ -19,6 +23,12 @@ class DetailsFragment : Fragment() {
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var favoriteFilms: FavoriteFilms
 
+    init {
+        exitTransition = Fade(Fade.OUT).apply { duration = MainActivity.TRANSITION_DURATION }
+        enterTransition = Fade(Fade.IN).apply { duration = MainActivity.TRANSITION_DURATION }
+        returnTransition = Fade(Fade.OUT).apply { duration = MainActivity.TRANSITION_DURATION }
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,16 +36,23 @@ class DetailsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentDetailsBinding.inflate(inflater, container, false)
+        postponeEnterTransition()
         return binding.root
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        favoriteFilms = MainActivity.favoriteFilms
-        initBottomNavigationView()
-        setDetails()
 
+        favoriteFilms = MainActivity.favoriteFilms
+        initSharedElementEnterTransition()
+        setDetails()
+        initBottomNavigationView()
+        initDetailsFabShare()
+        initDetailsFabFavorites()
+    }
+
+    private fun initDetailsFabFavorites() {
         binding.detailsFabFavorites.setOnClickListener {
             if (!favoriteFilms.contains(film)) {
                 binding.detailsFabFavorites.setImageResource(R.drawable.ic_baseline_favorite)
@@ -47,7 +64,14 @@ class DetailsFragment : Fragment() {
                 favoriteFilms.deleteFilm(film)
             }
         }
+    }
 
+    private fun initSharedElementEnterTransition() {
+        sharedElementEnterTransition = TransitionInflater.from(requireContext())
+            .inflateTransition(R.transition.image_shared_element_transition)
+    }
+
+    private fun initDetailsFabShare() {
         binding.detailsFabShare.setOnClickListener {
             //Создаем интент
             val intent = Intent()
@@ -81,10 +105,25 @@ class DetailsFragment : Fragment() {
             //Получаем наш фильм из переданного бандла
             arguments?.getParcelable<Film>(MainActivity.KEY_FILM_DETAILS_FRAGMENT) as Film
         }
+
         //Устанавливаем заголовок
+        binding.detailsPoster.transitionName = film.poster.toString()
         binding.detailsToolbar.title = film.title
+
         //Устанавливаем картинку
-        binding.detailsPoster.setImageResource(film.poster)
+        Picasso.get()
+            .load(film.poster)
+            .noFade()
+            .into(binding.detailsPoster, object : Callback {
+                override fun onSuccess() {
+                    startPostponedEnterTransition()
+                }
+
+                override fun onError(e: Exception?) {
+                    startPostponedEnterTransition()
+                }
+            })
+
         //Устанавливаем описание
         binding.detailsDescription.text = film.description
 
@@ -93,7 +132,6 @@ class DetailsFragment : Fragment() {
             else R.drawable.ic_baseline_favorite_border_24
         )
     }
-
 
     companion object {
         private const val MIME_TYPE = "text/plain"

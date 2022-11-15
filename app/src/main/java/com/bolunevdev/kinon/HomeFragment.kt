@@ -1,7 +1,6 @@
 package com.bolunevdev.kinon
 
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,25 +10,21 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.transition.*
-import androidx.transition.Fade.IN
-import androidx.transition.Fade.OUT
+import androidx.transition.Fade
 import com.bolunevdev.kinon.databinding.FragmentHomeBinding
-import com.bolunevdev.kinon.databinding.MergeHomeScreenContentBinding
 import java.util.*
 
 
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
-    private lateinit var bindingMerge: MergeHomeScreenContentBinding
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
     private lateinit var recyclerView: RecyclerView
-    private var isFirstRun = true
     private val filmsDataBase = MainActivity.filmsDataBase
+    private var isShare: Boolean = false
 
     init {
-        exitTransition = Fade(OUT).apply { duration = MainActivity.TRANSITION_DURATION }
+        reenterTransition = Fade(Fade.IN).apply { duration = MainActivity.TRANSITION_DURATION }
     }
 
     override fun onCreateView(
@@ -37,15 +32,16 @@ class HomeFragment : Fragment() {
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         postponeEnterTransition()
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        selectTransitionManager(savedInstanceState)
+        exitTransition = null
 
-        bindingMerge = MergeHomeScreenContentBinding.bind(binding.root)
+        startCircularRevealAnimation()
 
         initRV(filmsDataBase)
 
@@ -62,12 +58,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun initSearchView() {
-        bindingMerge.searchView.setOnClickListener {
-            bindingMerge.searchView.isIconified = false
+        binding.searchView.setOnClickListener {
+            binding.searchView.isIconified = false
         }
 
         //Подключаем слушателя изменений введенного текста в поиска
-        bindingMerge.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             //Этот метод отрабатывает при нажатии кнопки "поиск" на софт клавиатуре
             override fun onQueryTextSubmit(query: String?) = false
 
@@ -91,41 +87,9 @@ class HomeFragment : Fragment() {
         })
     }
 
-    private fun selectTransitionManager(savedInstanceState: Bundle?) {
-        val scene = Scene.getSceneForLayout(
-            binding.root,
-            R.layout.merge_home_screen_content,
-            requireContext()
-        )
-        //Создаем анимацию выезда поля поиска сверху
-        val searchSlide = Slide(Gravity.TOP).addTarget(R.id.search_view)
-        val searchFade = Fade(IN).addTarget(R.id.search_view)
-        //Создаем анимацию выезда RV снизу
-        val recyclerSlide = Slide(Gravity.BOTTOM).addTarget(R.id.main_recycler)
-        val recyclerFade = Fade(IN).addTarget(R.id.main_recycler)
-        //Создаем экземпляр TransitionSet, который объединит все наши анимации
-        val firstTransition = TransitionSet().apply {
-            //Устанавливаем время, за которое будет проходить анимация
-            duration = MainActivity.TRANSITION_DURATION
-            //Добавляем сами анимации
-            addTransition(recyclerFade)
-            addTransition(searchFade)
-            addTransition(recyclerSlide)
-            addTransition(searchSlide)
-        }
-
-        val transition = Fade(IN).apply { duration = MainActivity.TRANSITION_DURATION }
-
-        if (savedInstanceState == null && isFirstRun) {
-            isFirstRun = false
-            TransitionManager.go(scene, firstTransition)
-        } else TransitionManager.go(scene, transition)
-
-    }
-
     private fun initRV(filmsDataBase: MutableList<Film>) {
         //находим наш RV
-        recyclerView = bindingMerge.mainRecycler
+        recyclerView = binding.mainRecycler
 
         recyclerView.apply {
             //Инициализируем наш адаптер в конструктор передаем анонимно инициализированный интерфейс,
@@ -138,6 +102,7 @@ class HomeFragment : Fragment() {
                             R.id.action_homeFragment_to_detailsFragment,
                             poster
                         )
+                        isShare = true
                     }
                 }, object : FilmListRecyclerAdapter.OnItemLongClickListener {
                     override fun longClick(film: Film) {
@@ -162,5 +127,19 @@ class HomeFragment : Fragment() {
         val diffResult = DiffUtil.calculateDiff(diff)
         filmsAdapter.items = filmsDataBase
         diffResult.dispatchUpdatesTo(filmsAdapter)
+    }
+
+    private fun startCircularRevealAnimation() {
+        val menuPosition = 1
+        if (!isShare) {
+            AnimationHelper.performFragmentCircularRevealAnimation(
+                binding.root,
+                requireActivity(),
+                menuPosition
+            )
+            return
+        }
+        binding.root.visibility = View.VISIBLE
+        isShare = false
     }
 }

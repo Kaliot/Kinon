@@ -2,18 +2,27 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/home"
+        android:icon="@drawable/ic_baseline_home_24"
+        android:menuCategory="system"
+        android:title="@string/btn_home"
+        app:showAsAction="withText" />
+    <item
         android:id="@+id/new_titles"
         android:icon="@drawable/ic_baseline_new"
+        android:menuCategory="system"
         android:title="@string/btn_new_titles"
         app:showAsAction="withText" />
     <item
         android:id="@+id/favorites"
         android:icon="@drawable/ic_baseline_favorite"
+        android:menuCategory="system"
         android:title="@string/btn_favorites"
         app:showAsAction="withText" />
     <item
         android:id="@+id/recommended"
         android:icon="@drawable/ic_baseline_thumb_up_alt"
+        android:menuCategory="system"
         android:title="@string/btn_recommended"
         app:showAsAction="withText" />
 </menu>

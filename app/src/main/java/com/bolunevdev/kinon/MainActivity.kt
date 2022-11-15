@@ -1,6 +1,5 @@
 package com.bolunevdev.kinon
 
-//import android.R
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -26,9 +25,11 @@ class MainActivity : AppCompatActivity() {
     private val onBackPressedCallback: OnBackPressedCallback =
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (navController.currentDestination == navController.findDestination(R.id.homeFragment))
+                if (navController.currentDestination == navController.findDestination(R.id.home))
                     navController.navigate(R.id.action_homeFragment_to_exitMenuFragment)
-                else navController.popBackStack()
+                else {
+                    navController.popBackStack()
+                }
             }
         }
 

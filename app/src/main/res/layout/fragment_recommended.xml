@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/activity_main_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RecommendedFragment">
+    android:visibility="invisible"
+    tools:context=".RecommendedFragment"
+    tools:visibility="visible">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:textSize="@dimen/in_development_text_size"
-        android:text="@string/in_development" />
+        android:text="@string/in_development"
+        android:textSize="@dimen/in_development_text_size" />
 
 </FrameLayout>

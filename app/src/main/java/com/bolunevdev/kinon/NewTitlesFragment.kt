@@ -23,6 +23,12 @@ class NewTitlesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentNewTitlesBinding.inflate(inflater, container, false)
+        val menuPosition = 2
+        AnimationHelper.performFragmentCircularRevealAnimation(
+            binding.root,
+            requireActivity(),
+            menuPosition
+        )
         // Inflate the layout for this fragment
         return binding.root
     }

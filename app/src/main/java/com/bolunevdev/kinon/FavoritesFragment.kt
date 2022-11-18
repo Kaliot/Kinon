@@ -18,13 +18,11 @@ class FavoritesFragment : Fragment() {
     private lateinit var binding: FragmentFavoritesBinding
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
     private lateinit var recyclerView: RecyclerView
+    private var isShare: Boolean = false
+
 
     init {
-        exitTransition = Fade(Fade.OUT).apply { duration = MainActivity.TRANSITION_DURATION }
-        enterTransition = Fade(Fade.IN).apply { duration = MainActivity.TRANSITION_DURATION }
-        returnTransition = Fade(Fade.OUT).apply { duration = MainActivity.TRANSITION_DURATION }
         reenterTransition = Fade(Fade.IN).apply { duration = MainActivity.TRANSITION_DURATION }
-
     }
 
     override fun onCreateView(
@@ -39,10 +37,27 @@ class FavoritesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        exitTransition = null
+
         //Получаем список при транзакции фрагмента
         val favoritesList = MainActivity.favoriteFilms.getFilms()
+
+        startCircularRevealAnimation()
+
         initRV(favoritesList)
+
         initRVTreeObserver()
+    }
+
+    private fun startCircularRevealAnimation() {
+        if (!isShare) {
+            val menuPosition = 3
+            AnimationHelper
+                .performFragmentCircularRevealAnimation(binding.root, requireActivity(), menuPosition)
+            return
+        }
+        binding.root.visibility = View.VISIBLE
+        isShare = false
     }
 
     private fun initRVTreeObserver() {
@@ -66,6 +81,7 @@ class FavoritesFragment : Fragment() {
                             R.id.action_favorites_to_detailsFragment,
                             poster
                         )
+                        isShare = true
                     }
                 }, object : FilmListRecyclerAdapter.OnItemLongClickListener {
                     override fun longClick(film: Film) {

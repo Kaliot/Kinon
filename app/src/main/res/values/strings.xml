@@ -36,4 +36,5 @@
     <string name="CheckOutThisFilm">Взгляните на этот фильм:</string>
     <string name="film_title_copied">Название фильма скопировано</string>
     <string name="home_search_view_hint">Введите название фильма…</string>
+    <string name="btn_home">Домой</string>
 </resources>

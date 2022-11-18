@@ -23,6 +23,12 @@ class RecommendedFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentRecommendedBinding.inflate(inflater, container, false)
+        val menuPosition = 4
+        AnimationHelper.performFragmentCircularRevealAnimation(
+            binding.root,
+            requireActivity(),
+            menuPosition
+        )
         // Inflate the layout for this fragment
         return binding.root
     }

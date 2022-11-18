@@ -6,13 +6,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.setupWithNavController
 import androidx.transition.Fade
 import androidx.transition.TransitionInflater
 import com.bolunevdev.kinon.databinding.FragmentDetailsBinding
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 
@@ -20,11 +18,9 @@ import com.squareup.picasso.Picasso
 class DetailsFragment : Fragment() {
     private lateinit var binding: FragmentDetailsBinding
     private lateinit var film: Film
-    private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var favoriteFilms: FavoriteFilms
 
     init {
-        exitTransition = Fade(Fade.OUT).apply { duration = MainActivity.TRANSITION_DURATION }
         enterTransition = Fade(Fade.IN).apply { duration = MainActivity.TRANSITION_DURATION }
         returnTransition = Fade(Fade.OUT).apply { duration = MainActivity.TRANSITION_DURATION }
     }
@@ -44,11 +40,18 @@ class DetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        (requireActivity() as MainActivity)
+            .findViewById<FrameLayout>(R.id.background_share_transition)
+            .visibility = View.VISIBLE
+
         favoriteFilms = MainActivity.favoriteFilms
+
         initSharedElementEnterTransition()
+
         setDetails()
-        initBottomNavigationView()
+
         initDetailsFabShare()
+
         initDetailsFabFavorites()
     }
 
@@ -87,11 +90,6 @@ class DetailsFragment : Fragment() {
             //Запускаем наше активити
             startActivity(Intent.createChooser(intent, getString(R.string.ShareTo)))
         }
-    }
-
-    private fun initBottomNavigationView() {
-        bottomNavigationView = requireActivity().findViewById(R.id.bottom_navigation)
-        bottomNavigationView.setupWithNavController(findNavController())
     }
 
     private fun setDetails() {

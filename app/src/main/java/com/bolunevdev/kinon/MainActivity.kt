@@ -63,7 +63,20 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+        binding.bottomNavigation.setOnItemReselectedListener {
+            if (navController.currentDestination?.parent?.startDestinationId !=
+                navController.currentDestination?.id
+            )
+                navController.currentDestination?.parent?.startDestinationId?.let { it1 ->
+                    navController.popBackStack(
+                        it1, false
+                    )
+                }
+        }
+
     }
+
 
     private fun createFavoriteFilmsDataBase() {
         favoriteFilms = FavoriteFilms(this, filmsDataBase)

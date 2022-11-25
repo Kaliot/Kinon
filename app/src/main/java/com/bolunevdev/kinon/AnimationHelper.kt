@@ -11,7 +11,7 @@ import kotlin.math.roundToInt
 
 object AnimationHelper {
     //Это переменная для того, что бы круг проявления расходился именно от иконки меню навигации
-    private const val menuItems = 4
+    private const val MENU_ITEMS_NUM = 4
 
     //В метод у нас приходит 3 параметра:
     //1 - наше rootView, которое одновременно является и контейнером
@@ -30,8 +30,9 @@ object AnimationHelper {
                         activity.findViewById<FrameLayout>(R.id.background_share_transition).visibility =
                             View.GONE
                         //Cупер сложная математика вычесления старта анимации
-                        val itemCenter = rootView.width / (menuItems * 2)
-                        val step = (itemCenter * 2) * (position - 1) + itemCenter
+                        val centerMultiplier = 2
+                        val itemCenter = rootView.width / (MENU_ITEMS_NUM * centerMultiplier)
+                        val step = (itemCenter * centerMultiplier) * position - itemCenter
 
                         val x: Int = step
                         val y: Int = rootView.y.roundToInt() + rootView.height
@@ -43,7 +44,7 @@ object AnimationHelper {
                             rootView, x, y, startRadius.toFloat(), endRadius.toFloat()
                         ).apply {
                             //Устанавливаем время анимации
-                            duration = 500
+                            duration = MainActivity.TRANSITION_DURATION
                             //Интерполятор для более естесственной анимации
                             interpolator = AccelerateDecelerateInterpolator()
                             //Запускаем

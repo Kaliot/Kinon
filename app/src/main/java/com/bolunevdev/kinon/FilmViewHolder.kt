@@ -18,6 +18,7 @@ class FilmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val title = itemView.findViewById<TextView>(R.id.title)
     private val poster = itemView.findViewById<ImageView>(R.id.poster)
     private val description = itemView.findViewById<TextView>(R.id.description)
+    private val ratingDonut = itemView.findViewById<RatingDonutView>(R.id.rating_donut)
 
     //В этом методе кладем данные из Film в наши View
     fun bind(
@@ -37,7 +38,8 @@ class FilmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             .into(poster)
         //Устанавливаем описание
         description.text = film.description
-
+        //Устанавливаем рейтинг
+        ratingDonut.setProgress((film.rating * RATING_MULTIPLIER).toInt())
         //Обрабатываем нажатие на весь элемент целиком(можно сделать на отдельный элемент
         //например, картинку) и вызываем метод нашего листенера, который мы получаем из
         //конструктора адаптера
@@ -61,5 +63,9 @@ class FilmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             longClickListener.longClick(film)
             return@setOnLongClickListener true
         }
+    }
+
+    companion object {
+        const val RATING_MULTIPLIER = 10f
     }
 }

@@ -19,4 +19,6 @@
     <dimen name="exit_menu_text_header_margin">20dp</dimen>
     <dimen name="in_development_text_size">20sp</dimen>
     <dimen name="search_view_margin">8dp</dimen>
+    <dimen name="rating_donut_diameter">50dp</dimen>
+    <dimen name="rating_donut_translation_z">11dp</dimen>
 </resources>

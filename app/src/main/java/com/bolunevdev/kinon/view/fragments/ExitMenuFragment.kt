@@ -1,10 +1,11 @@
-package com.bolunevdev.kinon
+package com.bolunevdev.kinon.view.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.databinding.FragmentExitMenuBinding
 
 

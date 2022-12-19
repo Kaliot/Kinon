@@ -1,4 +1,4 @@
-package com.bolunevdev.kinon
+package com.bolunevdev.kinon.view.fragments
 
 import android.content.Intent
 import android.os.Build
@@ -10,6 +10,10 @@ import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.transition.Fade
 import androidx.transition.TransitionInflater
+import com.bolunevdev.kinon.utils.FavoriteFilms
+import com.bolunevdev.kinon.domain.Film
+import com.bolunevdev.kinon.view.activities.MainActivity
+import com.bolunevdev.kinon.R
 import com.bolunevdev.kinon.databinding.FragmentDetailsBinding
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -44,7 +48,7 @@ class DetailsFragment : Fragment() {
             .findViewById<FrameLayout>(R.id.background_share_transition)
             .visibility = View.VISIBLE
 
-        favoriteFilms = MainActivity.favoriteFilms
+        favoriteFilms = HomeFragment.favoriteFilms
 
         initSharedElementEnterTransition()
 

@@ -1,10 +1,12 @@
-package com.bolunevdev.kinon
+package com.bolunevdev.kinon.utils
 
 import android.app.Activity
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.FrameLayout
+import com.bolunevdev.kinon.view.activities.MainActivity
+import com.bolunevdev.kinon.R
 import java.util.concurrent.Executors
 import kotlin.math.hypot
 import kotlin.math.roundToInt

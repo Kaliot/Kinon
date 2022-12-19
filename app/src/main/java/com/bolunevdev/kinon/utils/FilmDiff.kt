@@ -1,8 +1,9 @@
-package com.bolunevdev.kinon
+package com.bolunevdev.kinon.utils
 
 import androidx.recyclerview.widget.DiffUtil
+import com.bolunevdev.kinon.domain.Film
 
-class FilmDiff(private val oldList: MutableList<Film>, private val newList: MutableList<Film>) :
+class FilmDiff(private val oldList: List<Film>, private val newList: List<Film>) :
     DiffUtil.Callback() {
 
     override fun getOldListSize() = oldList.size

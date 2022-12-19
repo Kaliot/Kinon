@@ -1,8 +1,10 @@
-package com.bolunevdev.kinon
+package com.bolunevdev.kinon.utils
 
 import android.content.Context
+import com.bolunevdev.kinon.domain.Film
+import com.bolunevdev.kinon.view.activities.MainActivity
 
-class FavoriteFilms(context: Context, filmsDataBase: MutableList<Film>) {
+class FavoriteFilms(context: Context, filmsDataBase: List<Film>) {
 
     private var films = mutableListOf<Film>()
     private val preferences =
@@ -41,8 +43,8 @@ class FavoriteFilms(context: Context, filmsDataBase: MutableList<Film>) {
         preferences.edit().putString(PREF_FF_KEY, idString).apply()
     }
 
-    private fun addFilmById(id: String, filmsDataBase: MutableList<Film>?) {
-        if (filmsDataBase != null && id.isNotEmpty()) {
+    private fun addFilmById(id: String, filmsDataBase: List<Film>) {
+        if (id.isNotEmpty()) {
             filmsDataBase.find { it.id == id.toInt() }?.let { films.add(it) }
         }
     }

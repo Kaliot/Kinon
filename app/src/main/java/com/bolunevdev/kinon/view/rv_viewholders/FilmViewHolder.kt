@@ -1,4 +1,4 @@
-package com.bolunevdev.kinon
+package com.bolunevdev.kinon.view.rv_viewholders
 
 
 import android.view.View
@@ -9,6 +9,11 @@ import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Fade
 import androidx.transition.TransitionSet
+import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
+import com.bolunevdev.kinon.R
+import com.bolunevdev.kinon.domain.Film
+import com.bolunevdev.kinon.view.activities.MainActivity
+import com.bolunevdev.kinon.view.customviews.RatingDonutView
 import com.bumptech.glide.Glide
 
 

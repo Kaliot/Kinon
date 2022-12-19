@@ -1,4 +1,4 @@
-package com.bolunevdev.kinon
+package com.bolunevdev.kinon.view.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.SystemClock.sleep
 import androidx.appcompat.app.AppCompatActivity
 import com.airbnb.lottie.LottieAnimationView
+import com.bolunevdev.kinon.R
 import java.util.concurrent.Executors
 
 @SuppressLint("CustomSplashScreen")

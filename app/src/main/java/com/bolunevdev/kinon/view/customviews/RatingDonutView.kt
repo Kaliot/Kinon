@@ -1,14 +1,12 @@
-package com.bolunevdev.kinon
+package com.bolunevdev.kinon.view.customviews
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
-import android.os.Handler
-import android.os.Looper
 import android.util.AttributeSet
 import android.view.View
-import com.bolunevdev.kinon.FilmViewHolder.Companion.RATING_MULTIPLIER
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import com.bolunevdev.kinon.view.rv_viewholders.FilmViewHolder.Companion.RATING_MULTIPLIER
+import com.bolunevdev.kinon.R
 
 
 class RatingDonutView @JvmOverloads constructor(
@@ -18,7 +16,6 @@ class RatingDonutView @JvmOverloads constructor(
     private lateinit var backgroundBitmap: Bitmap
     private lateinit var backgroundStaticCanvas: Canvas
     private var isStaticBackgroundDrawn: Boolean = false
-
 
     //Овал для рисования сегментов прогресс бара
     private val oval = RectF()
@@ -41,7 +38,6 @@ class RatingDonutView @JvmOverloads constructor(
     private lateinit var strokePaint: Paint
     private lateinit var digitPaint: Paint
     private lateinit var circlePaint: Paint
-    private val executor: ExecutorService = Executors.newSingleThreadExecutor()
     private var isFirstRun: Boolean = true
 
     private lateinit var message: String
@@ -88,7 +84,7 @@ class RatingDonutView @JvmOverloads constructor(
         circlePaint = Paint().apply {
             style = Paint.Style.FILL
             color = Color.DKGRAY
-            alpha = 200
+            alpha = ALPHA
         }
     }
 
@@ -148,13 +144,12 @@ class RatingDonutView @JvmOverloads constructor(
     private fun chooseDimension(mode: Int, size: Int) =
         when (mode) {
             MeasureSpec.AT_MOST, MeasureSpec.EXACTLY -> size
-            else -> 300
+            else -> DEFAULT_DIMENSION
         }
 
     private fun drawRating(canvas: Canvas) {
         //Здесь мы можем регулировать размер нашего кольца
-        val scaleCoefficient = 0.8f
-        val scale = radius * scaleCoefficient
+        val scale = radius * SCALE_COEFFICIENT
         //Сохраняем канвас
         canvas.save()
         //Перемещаем нулевые координаты канваса в центр, вы помните, так проще рисовать все круглое
@@ -215,27 +210,30 @@ class RatingDonutView @JvmOverloads constructor(
     }
 
     fun setProgress(pr: Int) {
+        val animator = ValueAnimator.ofInt(0, pr)
         if (isFirstRun) {
-            val animationDuration = 600L
-            executor.execute {
-                for (i in 1..pr) {
-                    //Кладем новое значение в наше поле класса
-                    progress = i
-                    //Создаем краски с новыми цветами
-                    Handler(Looper.getMainLooper()).post {
-                        initPaint()
-                        //вызываем перерисовку View
-                        invalidate()
-                    }
-                    Thread.sleep(animationDuration / pr)
-                }
-                return@execute
+            animator.duration = ANIMATION_DURATION
+            animator.addUpdateListener {
+                //Кладем новое значение в наше поле класса
+                progress = it.animatedValue as Int
+                //Создаем краски с новыми цветами
+                initPaint()
+                //вызываем перерисовку View
+                invalidate()
             }
+            animator.start()
             isFirstRun = false
         } else {
             progress = pr
             initPaint()
             invalidate()
         }
+    }
+
+    companion object {
+        const val ANIMATION_DURATION = 600L
+        const val SCALE_COEFFICIENT = 0.8f
+        const val DEFAULT_DIMENSION = 300
+        const val ALPHA = 200
     }
 }

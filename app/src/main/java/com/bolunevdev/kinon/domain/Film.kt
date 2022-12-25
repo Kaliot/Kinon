@@ -1,4 +1,4 @@
-package com.bolunevdev.kinon
+package com.bolunevdev.kinon.domain
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

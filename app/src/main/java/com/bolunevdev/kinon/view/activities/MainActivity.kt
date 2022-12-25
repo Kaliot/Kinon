@@ -1,4 +1,4 @@
-package com.bolunevdev.kinon
+package com.bolunevdev.kinon.view.activities
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -12,7 +12,10 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.bolunevdev.kinon.R
 import com.bolunevdev.kinon.databinding.ActivityMainBinding
+import com.bolunevdev.kinon.domain.Film
+import com.bolunevdev.kinon.view.fragments.DetailsFragment
 
 
 class MainActivity : AppCompatActivity() {
@@ -36,8 +39,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        createFilmsDataBase()
-        createFavoriteFilmsDataBase()
         clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
         binding = ActivityMainBinding.inflate(layoutInflater).also { setContentView(it.root) }
@@ -77,15 +78,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
-    private fun createFavoriteFilmsDataBase() {
-        favoriteFilms = FavoriteFilms(this, filmsDataBase)
-    }
-
-    private fun createFilmsDataBase() {
-        filmsDataBase = FilmsDataBase(this).getFilms()
-    }
-
     fun launchDetailsFragment(film: Film, direction: Int, poster: ImageView) {
         //Создаем "посылку"
         val bundle = Bundle()
@@ -115,14 +107,11 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, getString(R.string.film_title_copied), Toast.LENGTH_SHORT).show()
     }
 
-
     companion object {
         const val KEY_FILM_DETAILS_FRAGMENT = "film"
         const val FAVORITE_FILMS_PREFERENCES = "FAVORITE_FILMS_PREFERENCES"
         const val FILM_TITLE = "FILM_TITLE"
         const val TRANSITION_DURATION = 400L
         const val TRANSITION_DURATION_FAST = 150L
-        lateinit var filmsDataBase: MutableList<Film>
-        lateinit var favoriteFilms: FavoriteFilms
     }
 }

@@ -1,4 +1,4 @@
-package com.bolunevdev.kinon
+package com.bolunevdev.kinon.view.rv_adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,6 +6,10 @@ import android.widget.ImageView
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bolunevdev.kinon.utils.FilmDiff
+import com.bolunevdev.kinon.R
+import com.bolunevdev.kinon.domain.Film
+import com.bolunevdev.kinon.view.rv_viewholders.FilmViewHolder
 
 //в параметр передаем слушатель, чтобы мы потом могли обрабатывать нажатия из класса Activity
 class FilmListRecyclerAdapter(
@@ -15,9 +19,9 @@ class FilmListRecyclerAdapter(
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     //Здесь у нас хранится список элементов для RV
-    var items = mutableListOf<Film>()
+    var items = listOf<Film>()
         set(newValue) {
-            val diffCallback = FilmDiff(field as ArrayList<Film>, newValue as ArrayList<Film>)
+            val diffCallback = FilmDiff(field, newValue)
             val diffResult = DiffUtil.calculateDiff(diffCallback)
             field = newValue
             diffResult.dispatchUpdatesTo(this)

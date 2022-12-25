@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:visibility="invisible"
-    tools:context=".NewTitlesFragment"
+    tools:context=".view.fragments.NewTitlesFragment"
     tools:visibility="visible">
 
     <TextView

@@ -1,4 +1,4 @@
-package com.bolunevdev.kinon
+package com.bolunevdev.kinon.view.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +10,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Fade
+import com.bolunevdev.kinon.*
 import com.bolunevdev.kinon.databinding.FragmentFavoritesBinding
+import com.bolunevdev.kinon.domain.Film
+import com.bolunevdev.kinon.utils.AnimationHelper
+import com.bolunevdev.kinon.utils.FilmDiff
+import com.bolunevdev.kinon.view.activities.MainActivity
+import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
+import com.bolunevdev.kinon.view.rv_adapters.TopSpacingItemDecoration
 
 
 class FavoritesFragment : Fragment() {
@@ -26,7 +33,7 @@ class FavoritesFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
     ): View {
         binding = FragmentFavoritesBinding.inflate(inflater, container, false)
         postponeEnterTransition()
@@ -40,7 +47,7 @@ class FavoritesFragment : Fragment() {
         exitTransition = null
 
         //Получаем список при транзакции фрагмента
-        val favoritesList = MainActivity.favoriteFilms.getFilms()
+        val favoritesList = HomeFragment.favoriteFilms.getFilms()
 
         startCircularRevealAnimation()
 
@@ -53,7 +60,9 @@ class FavoritesFragment : Fragment() {
         if (!isShare) {
             val menuPosition = 3
             AnimationHelper
-                .performFragmentCircularRevealAnimation(binding.root, requireActivity(), menuPosition)
+                .performFragmentCircularRevealAnimation(binding.root,
+                    requireActivity(),
+                    menuPosition)
             return
         }
         binding.root.visibility = View.VISIBLE
@@ -89,6 +98,9 @@ class FavoritesFragment : Fragment() {
                     }
                 })
 
+            //Присваиваем адаптер
+            recyclerView.adapter = filmsAdapter
+
             //Присвоим layoutManager
             val layoutManager = LinearLayoutManager(requireContext())
             recyclerView.layoutManager = layoutManager
@@ -101,9 +113,6 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun updateData(filmsDataBase: MutableList<Film>) {
-        //Присваиваем адаптер
-        recyclerView.adapter = filmsAdapter
-
         //Кладем нашу БД в RV
         val diff = FilmDiff(filmsAdapter.items, filmsDataBase)
         val diffResult = DiffUtil.calculateDiff(diff)

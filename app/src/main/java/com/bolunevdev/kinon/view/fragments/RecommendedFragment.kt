@@ -1,4 +1,4 @@
-package com.bolunevdev.kinon
+package com.bolunevdev.kinon.view.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,12 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.transition.Fade
-import com.bolunevdev.kinon.databinding.FragmentNewTitlesBinding
+import com.bolunevdev.kinon.view.activities.MainActivity
+import com.bolunevdev.kinon.databinding.FragmentRecommendedBinding
+import com.bolunevdev.kinon.utils.AnimationHelper
 
 
-class NewTitlesFragment : Fragment() {
+class RecommendedFragment : Fragment() {
 
-    private lateinit var binding: FragmentNewTitlesBinding
+    private lateinit var binding: FragmentRecommendedBinding
 
     init {
         enterTransition = Fade(Fade.IN).apply { duration = MainActivity.TRANSITION_DURATION }
@@ -22,8 +24,8 @@ class NewTitlesFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentNewTitlesBinding.inflate(inflater, container, false)
-        val menuPosition = 2
+        binding = FragmentRecommendedBinding.inflate(inflater, container, false)
+        val menuPosition = 4
         AnimationHelper.performFragmentCircularRevealAnimation(
             binding.root,
             requireActivity(),

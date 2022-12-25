@@ -10,7 +10,7 @@
         app:startDestination="@id/home">
         <fragment
             android:id="@+id/home"
-            android:name="com.bolunevdev.kinon.HomeFragment"
+            android:name="com.bolunevdev.kinon.view.fragments.HomeFragment"
             android:label="fragment_home"
             tools:layout="@layout/fragment_home">
             <action
@@ -27,13 +27,13 @@
 
         <fragment
             android:id="@+id/detailsFragment"
-            android:name="com.bolunevdev.kinon.DetailsFragment"
+            android:name="com.bolunevdev.kinon.view.fragments.DetailsFragment"
             android:label="fragment_details"
             tools:layout="@layout/fragment_details" />
 
         <dialog
             android:id="@+id/exitMenuFragment"
-            android:name="com.bolunevdev.kinon.ExitMenuFragment"
+            android:name="com.bolunevdev.kinon.view.fragments.ExitMenuFragment"
             android:label="fragment_exit_menu"
             tools:layout="@layout/fragment_exit_menu" />
     </navigation>
@@ -43,7 +43,7 @@
         app:startDestination="@id/favorites">
         <fragment
             android:id="@+id/favorites"
-            android:name="com.bolunevdev.kinon.FavoritesFragment"
+            android:name="com.bolunevdev.kinon.view.fragments.FavoritesFragment"
             android:label="Favorites"
             tools:layout="@layout/fragment_favorites">
             <action
@@ -52,7 +52,7 @@
         </fragment>
         <fragment
             android:id="@+id/detailsFragment"
-            android:name="com.bolunevdev.kinon.DetailsFragment"
+            android:name="com.bolunevdev.kinon.view.fragments.DetailsFragment"
             android:label="fragment_details"
             tools:layout="@layout/fragment_details" />
     </navigation>
@@ -62,7 +62,7 @@
         app:startDestination="@id/new_titles">
         <fragment
             android:id="@+id/new_titles"
-            android:name="com.bolunevdev.kinon.NewTitlesFragment"
+            android:name="com.bolunevdev.kinon.view.fragments.NewTitlesFragment"
             android:label="New_titles"
             tools:layout="@layout/fragment_new_titles" />
     </navigation>
@@ -72,7 +72,7 @@
         app:startDestination="@id/recommended">
         <fragment
             android:id="@+id/recommended"
-            android:name="com.bolunevdev.kinon.RecommendedFragment"
+            android:name="com.bolunevdev.kinon.view.fragments.RecommendedFragment"
             android:label="Recommended"
             tools:layout="@layout/fragment_recommended" />
     </navigation>

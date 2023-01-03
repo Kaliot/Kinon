@@ -11,11 +11,11 @@ import androidx.transition.Fade
 import androidx.transition.TransitionSet
 import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
 import com.bolunevdev.kinon.R
+import com.bolunevdev.kinon.data.ApiConstants
 import com.bolunevdev.kinon.domain.Film
 import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.view.customviews.RatingDonutView
 import com.bumptech.glide.Glide
-
 
 class FilmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -36,7 +36,7 @@ class FilmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         //Устанавливаем постер
         Glide.with(itemView)
             //Загружаем сам ресурс
-            .load(film.poster)
+            .load(ApiConstants.IMAGES_URL + IMAGE_SIZE + film.poster)
             //Центруем изображение
             .centerCrop()
             //Указываем ImageView, куда будем загружать изображение
@@ -72,5 +72,6 @@ class FilmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     companion object {
         const val RATING_MULTIPLIER = 10f
+        private const val IMAGE_SIZE = "w342"
     }
 }

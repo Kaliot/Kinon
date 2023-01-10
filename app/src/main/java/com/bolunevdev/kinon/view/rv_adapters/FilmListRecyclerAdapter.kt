@@ -18,14 +18,7 @@ class FilmListRecyclerAdapter(
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    //Здесь у нас хранится список элементов для RV
-    var items = listOf<Film>()
-        set(newValue) {
-            val diffCallback = FilmDiff(field, newValue)
-            val diffResult = DiffUtil.calculateDiff(diffCallback)
-            field = newValue
-            diffResult.dispatchUpdatesTo(this)
-        }
+    private var items = listOf<Film>()
 
     //Этот метод нужно переопределить на возврат количества элементов в списке RV
     override fun getItemCount() = items.size
@@ -43,13 +36,22 @@ class FilmListRecyclerAdapter(
             is FilmViewHolder -> {
                 ViewCompat.setTransitionName(
                     holder.itemView.findViewById(R.id.poster),
-                    items[position].poster.toString()
+                    items[position].poster
                 )
                 //Вызываем метод bind(), который мы создали, и передаем туда объект
                 //из нашей базы данных с указанием позиции
                 holder.bind(items[position], clickListener, longClickListener)
             }
         }
+    }
+
+    fun updateData(filmsDataBase: List<Film>) {
+        val oldFilmsList = items
+        //Кладем нашу БД в RV
+        val diff = FilmDiff(oldFilmsList, filmsDataBase)
+        val diffResult = DiffUtil.calculateDiff(diff)
+        items = filmsDataBase
+        diffResult.dispatchUpdatesTo(this)
     }
 
     //Интерфейс для обработки кликов

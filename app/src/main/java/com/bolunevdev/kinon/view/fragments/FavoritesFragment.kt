@@ -6,15 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Fade
-import com.bolunevdev.kinon.*
+import com.bolunevdev.kinon.R
 import com.bolunevdev.kinon.databinding.FragmentFavoritesBinding
 import com.bolunevdev.kinon.domain.Film
 import com.bolunevdev.kinon.utils.AnimationHelper
-import com.bolunevdev.kinon.utils.FilmDiff
 import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
 import com.bolunevdev.kinon.view.rv_adapters.TopSpacingItemDecoration
@@ -26,7 +24,6 @@ class FavoritesFragment : Fragment() {
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
     private lateinit var recyclerView: RecyclerView
     private var isShare: Boolean = false
-
 
     init {
         reenterTransition = Fade(Fade.IN).apply { duration = MainActivity.TRANSITION_DURATION }
@@ -109,14 +106,6 @@ class FavoritesFragment : Fragment() {
             val decorator = TopSpacingItemDecoration(8)
             addItemDecoration(decorator)
         }
-        updateData(filmsDataBase)
-    }
-
-    private fun updateData(filmsDataBase: MutableList<Film>) {
-        //Кладем нашу БД в RV
-        val diff = FilmDiff(filmsAdapter.items, filmsDataBase)
-        val diffResult = DiffUtil.calculateDiff(diff)
-        filmsAdapter.items = filmsDataBase
-        diffResult.dispatchUpdatesTo(filmsAdapter)
+        filmsAdapter.updateData(filmsDataBase)
     }
 }

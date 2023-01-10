@@ -1,6 +1,7 @@
 package com.bolunevdev.kinon.view.fragments
 
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,13 +11,17 @@ import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.transition.Fade
 import androidx.transition.TransitionInflater
-import com.bolunevdev.kinon.utils.FavoriteFilms
-import com.bolunevdev.kinon.domain.Film
-import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.R
+import com.bolunevdev.kinon.data.ApiConstants
 import com.bolunevdev.kinon.databinding.FragmentDetailsBinding
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
+import com.bolunevdev.kinon.domain.Film
+import com.bolunevdev.kinon.utils.FavoriteFilms
+import com.bolunevdev.kinon.view.activities.MainActivity
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 
 
 class DetailsFragment : Fragment() {
@@ -109,22 +114,37 @@ class DetailsFragment : Fragment() {
         }
 
         //Устанавливаем заголовок
-        binding.detailsPoster.transitionName = film.poster.toString()
+        binding.detailsPoster.transitionName = film.poster
         binding.detailsToolbar.title = film.title
 
         //Устанавливаем картинку
-        Picasso.get()
-            .load(film.poster)
-            .noFade()
-            .into(binding.detailsPoster, object : Callback {
-                override fun onSuccess() {
+        Glide.with(this)
+            .load(ApiConstants.IMAGES_URL + IMAGE_SIZE + film.poster)
+            .centerCrop()
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
                     startPostponedEnterTransition()
+                    return false
                 }
 
-                override fun onError(e: Exception?) {
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
                     startPostponedEnterTransition()
+                    return false
                 }
             })
+            .into(binding.detailsPoster)
+
 
         //Устанавливаем описание
         binding.detailsDescription.text = film.description
@@ -137,5 +157,6 @@ class DetailsFragment : Fragment() {
 
     companion object {
         private const val MIME_TYPE = "text/plain"
+        private const val IMAGE_SIZE = "w780"
     }
 }

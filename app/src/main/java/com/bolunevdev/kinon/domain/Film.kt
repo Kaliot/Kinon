@@ -7,10 +7,10 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class Film(
     val title: String,
-    val poster: Int,
+    val poster: String,
     val description: String,
-    var rating: Float = 0f,
-    val id: Int = poster,
+    var rating: Double = 0.0,
+    val id: Int,
     var isInFavorites: Boolean = false
 ) : Parcelable
 

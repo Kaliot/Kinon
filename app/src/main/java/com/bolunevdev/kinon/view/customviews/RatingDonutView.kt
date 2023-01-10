@@ -90,27 +90,27 @@ class RatingDonutView @JvmOverloads constructor(
 
     private fun getPaintColor(progress: Int): Int = when (progress) {
         in 0..25 -> Color.argb(
-            255,
-            170 + 85 * progress / 25,
+            ALPHA_VALUE,
+            START_RED + RED_INCREMENT * progress / MIN_FACTOR,
             0,
             0
         )
         in 26..50 -> Color.argb(
-            255,
-            255,
-            170 * (progress - 25) / 25,
+            ALPHA_VALUE,
+            MAX_RED,
+            START_GREEN * (progress - MIN_FACTOR) / MIN_FACTOR,
             0
         )
         in 51..75 -> Color.argb(
-            255,
-            255 - 85 * (progress - 50) / 25,
-            170 + 85 * (progress - 50) / 25,
+            ALPHA_VALUE,
+            MAX_RED - RED_INCREMENT * (progress - MID_FACTOR) / MIN_FACTOR,
+            START_GREEN + GREEN_INCREMENT * (progress - MID_FACTOR) / MIN_FACTOR,
             0
         )
         else -> Color.argb(
-            255,
-            170 - 170 * (progress - 75) / 25,
-            255,
+            ALPHA_VALUE,
+            START_RED - START_RED * (progress - MAX_FACTOR) / MIN_FACTOR,
+            MAX_GREEN,
             0
         )
     }
@@ -235,5 +235,15 @@ class RatingDonutView @JvmOverloads constructor(
         const val SCALE_COEFFICIENT = 0.8f
         const val DEFAULT_DIMENSION = 300
         const val ALPHA = 200
+        const val ALPHA_VALUE = 255
+        const val MAX_FACTOR = 75
+        const val MIN_FACTOR = 25
+        const val MID_FACTOR = 50
+        const val MAX_RED = 255
+        const val START_RED = 170
+        const val RED_INCREMENT = 85
+        const val START_GREEN = 170
+        const val GREEN_INCREMENT = 85
+        const val MAX_GREEN = 255
     }
 }

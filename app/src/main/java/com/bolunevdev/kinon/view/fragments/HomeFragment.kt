@@ -8,7 +8,6 @@ import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Fade
@@ -17,7 +16,6 @@ import com.bolunevdev.kinon.databinding.FragmentHomeBinding
 import com.bolunevdev.kinon.domain.Film
 import com.bolunevdev.kinon.utils.AnimationHelper
 import com.bolunevdev.kinon.utils.FavoriteFilms
-import com.bolunevdev.kinon.utils.FilmDiff
 import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
 import com.bolunevdev.kinon.view.rv_adapters.TopSpacingItemDecoration
@@ -34,8 +32,7 @@ class HomeFragment : Fragment() {
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
     private lateinit var recyclerView: RecyclerView
     private var isShare: Boolean = false
-
-    private var filmsDataBase = listOf<Film>()
+    private var filmsDataBase = mutableListOf<Film>()
         //Используем backing field
         set(value) {
             //Если придет такое же значение, то мы выходим из метода
@@ -43,7 +40,7 @@ class HomeFragment : Fragment() {
             //Если пришло другое значение, то кладем его в переменную
             field = value
             //Обновляем RV адаптер
-            updateData(field)
+            filmsAdapter.updateData(field)
             createFavoriteFilmsDataBase()
         }
 
@@ -67,15 +64,48 @@ class HomeFragment : Fragment() {
 
         startCircularRevealAnimation()
 
-        viewModel.filmsListLiveData.observe(viewLifecycleOwner) {
-            filmsDataBase = it
-        }
 
         initRV()
+
+        viewModel.filmsListLiveData.observe(viewLifecycleOwner) {
+            filmsDataBase = it.toMutableList()
+            filmsAdapter.updateData(filmsDataBase)
+        }
 
         initRVTreeObserver()
 
         initSearchView()
+
+        addRVScrollListener()
+    }
+
+    private fun addRVScrollListener() {
+        val scrollListener = object: RecyclerView.OnScrollListener() {
+            @Override
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val layoutManager = recyclerView.layoutManager as RecyclerView.LayoutManager
+                //смотрим сколько элементов на экране
+                val visibleItemCount: Int = layoutManager.childCount
+                //сколько всего элементов
+                val totalItemCount: Int = layoutManager.itemCount
+
+                //какая позиция первого элемента
+                val firstVisibleItems = (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+
+                //проверяем, грузим мы что-то или нет
+                if (!isLoading) {
+                    if (visibleItemCount + firstVisibleItems >= totalItemCount - VISIBLE_THRESHOLD) {
+                        //ставим флаг, что мы попросили еще элементы
+                        isLoading = true
+                        //Вызывает загрузку данных в RecyclerView
+                        viewModel.increasePageNumber()
+                        viewModel.getFilmsFromApi()
+                    }
+                }
+            }
+        }
+        recyclerView.addOnScrollListener(scrollListener)
     }
 
     private fun initRVTreeObserver() {
@@ -99,7 +129,8 @@ class HomeFragment : Fragment() {
             override fun onQueryTextChange(newText: String): Boolean {
                 //Если ввод пуст то вставляем в адаптер всю БД
                 if (newText.isEmpty()) {
-                    updateData(filmsDataBase)
+                    isLoading = false
+                    filmsAdapter.updateData(filmsDataBase)
                     return true
                 }
                 //Фильтруем список на поискк подходящих сочетаний
@@ -109,7 +140,8 @@ class HomeFragment : Fragment() {
                         .contains(newText.lowercase(Locale.getDefault()))
                 }
                 //Добавляем в адаптер
-                updateData(result)
+                isLoading = true
+                filmsAdapter.updateData(result)
                 return true
             }
         })
@@ -143,18 +175,9 @@ class HomeFragment : Fragment() {
             val layoutManager = LinearLayoutManager(requireContext())
             recyclerView.layoutManager = layoutManager
             //Применяем декоратор для отступов
-            val decorator = TopSpacingItemDecoration(8)
+            val decorator = TopSpacingItemDecoration(DECORATOR_PADDING_IN_DP)
             addItemDecoration(decorator)
         }
-        updateData(filmsDataBase)
-    }
-
-    private fun updateData(filmsDataBase: List<Film>) {
-        //Кладем нашу БД в RV
-        val diff = FilmDiff(filmsAdapter.items, filmsDataBase)
-        val diffResult = DiffUtil.calculateDiff(diff)
-        filmsAdapter.items = this.filmsDataBase
-        diffResult.dispatchUpdatesTo(filmsAdapter)
     }
 
     private fun startCircularRevealAnimation() {
@@ -177,5 +200,8 @@ class HomeFragment : Fragment() {
 
     companion object {
         lateinit var favoriteFilms: FavoriteFilms
+        private const val VISIBLE_THRESHOLD  = 5
+        private const val DECORATOR_PADDING_IN_DP = 8
+        var isLoading: Boolean = false
     }
 }

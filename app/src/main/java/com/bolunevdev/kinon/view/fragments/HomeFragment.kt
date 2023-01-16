@@ -70,6 +70,7 @@ class HomeFragment : Fragment() {
         viewModel.filmsListLiveData.observe(viewLifecycleOwner) {
             filmsDataBase = it.toMutableList()
             filmsAdapter.updateData(filmsDataBase)
+            isLoading = false
         }
 
         initRVTreeObserver()
@@ -202,6 +203,6 @@ class HomeFragment : Fragment() {
         lateinit var favoriteFilms: FavoriteFilms
         private const val VISIBLE_THRESHOLD  = 5
         private const val DECORATOR_PADDING_IN_DP = 8
-        var isLoading: Boolean = false
+        private var isLoading: Boolean = false
     }
 }

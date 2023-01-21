@@ -5,16 +5,20 @@ import androidx.lifecycle.ViewModel
 import com.bolunevdev.kinon.App
 import com.bolunevdev.kinon.domain.Film
 import com.bolunevdev.kinon.domain.Interactor
-import com.bolunevdev.kinon.view.fragments.HomeFragment
+import javax.inject.Inject
+
 
 class HomeFragmentViewModel : ViewModel() {
-    val filmsListLiveData = MutableLiveData<List<Film>>()
+    val filmsListLiveData: MutableLiveData<List<Film>> = MutableLiveData()
     private val filmsList = mutableListOf<Film>()
     //Инициализируем интерактор
-    private var interactor: Interactor = App.instance.interactor
+    @Inject
+    lateinit var interactor: Interactor
+
     private var pageNumber = 1
 
     init {
+        App.instance.dagger.inject(this)
         getFilmsFromApi()
     }
 
@@ -23,7 +27,6 @@ class HomeFragmentViewModel : ViewModel() {
             override fun onSuccess(films: List<Film>) {
                 filmsList.addAll(films)
                 filmsListLiveData.postValue(filmsList)
-                HomeFragment.isLoading = false
             }
             override fun onFailure() {
             }

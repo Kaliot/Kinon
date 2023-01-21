@@ -1,7 +1,9 @@
 plugins {
     id 'com.android.application'
+    id 'kotlin-android'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-parcelize'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -38,16 +40,23 @@ android {
 }
 
 dependencies {
+    // AndroidX
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'com.google.android.material:material:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation "androidx.fragment:fragment-ktx:1.5.5"
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
     implementation "androidx.navigation:navigation-ui-ktx:2.5.3"
+
+    //MaterialDesign
+    implementation 'com.google.android.material:material:1.7.0'
+
+    // Glide
     implementation 'com.github.bumptech.glide:glide:4.12.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+
+    // Lottie
     implementation 'com.airbnb.android:lottie:3.4.4'
 
     //Retrofit
@@ -58,8 +67,12 @@ dependencies {
     //Tests
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.hamcrest:hamcrest-library:2.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.1'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
+
+    //Dagger
+    implementation 'com.google.dagger:dagger:2.44.2'
+    kapt 'com.google.dagger:dagger-compiler:2.37'
 }

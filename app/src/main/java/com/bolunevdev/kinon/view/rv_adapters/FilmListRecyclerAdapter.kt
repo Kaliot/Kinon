@@ -36,7 +36,7 @@ class FilmListRecyclerAdapter(
             is FilmViewHolder -> {
                 ViewCompat.setTransitionName(
                     holder.itemView.findViewById(R.id.poster),
-                    items[position].poster
+                    items[position].id.toString()
                 )
                 //Вызываем метод bind(), который мы создали, и передаем туда объект
                 //из нашей базы данных с указанием позиции

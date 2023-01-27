@@ -114,19 +114,20 @@ class DetailsFragment : Fragment() {
         }
 
         //Устанавливаем заголовок
-        binding.detailsPoster.transitionName = film.poster
+        binding.detailsPoster.transitionName = film.id.toString()
         binding.detailsToolbar.title = film.title
 
         //Устанавливаем картинку
         Glide.with(this)
             .load(ApiConstants.IMAGES_URL + IMAGE_SIZE + film.poster)
+            .error(R.drawable.no_poster_holder)
             .centerCrop()
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?,
                     model: Any?,
                     target: Target<Drawable>?,
-                    isFirstResource: Boolean
+                    isFirstResource: Boolean,
                 ): Boolean {
                     startPostponedEnterTransition()
                     return false

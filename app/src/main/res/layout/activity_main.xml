@@ -8,30 +8,11 @@
     android:background="@drawable/circular_reveal_color"
     tools:context=".view.activities.MainActivity">
 
-
     <FrameLayout
         android:id="@+id/background_share_transition"
         style="@style/activity_main_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/topAppBar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:menu="@menu/top_app_bar"
-            app:navigationIcon="@drawable/ic_baseline_menu"
-            app:title="@string/app_name"
-            app:titleTextColor="@android:color/white" />
-
-    </com.google.android.material.appbar.AppBarLayout>
-
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_placeholder"
@@ -40,7 +21,7 @@
         android:layout_height="0dp"
         app:defaultNavHost="true"
         app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
-        app:layout_constraintTop_toBottomOf="@id/app_bar_layout"
+        app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/navigation" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -51,6 +32,5 @@
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/navigation_menu" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,6 @@
 package com.bolunevdev.kinon.viewmodel
 
+import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bolunevdev.kinon.App
@@ -11,6 +12,7 @@ import javax.inject.Inject
 class HomeFragmentViewModel : ViewModel() {
     val filmsListLiveData: MutableLiveData<List<Film>> = MutableLiveData()
     private val filmsList = mutableListOf<Film>()
+
     //Инициализируем интерактор
     @Inject
     lateinit var interactor: Interactor
@@ -28,13 +30,27 @@ class HomeFragmentViewModel : ViewModel() {
                 filmsList.addAll(films)
                 filmsListLiveData.postValue(filmsList)
             }
+
             override fun onFailure() {
             }
         })
     }
 
+    fun addPreferenceListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+        interactor.addSharedPreferencesCategoryChangeListener(listener)
+    }
+
+    fun clearFilmsList() {
+        filmsList.clear()
+        pageNumber = 1
+    }
+
     fun increasePageNumber() {
         pageNumber++
+    }
+
+    fun unregisterPreferencesListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+        interactor.unregisterSharedPreferencesCategoryChangeListener(listener)
     }
 
     interface ApiCallback {

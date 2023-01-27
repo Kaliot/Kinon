@@ -21,4 +21,6 @@
     <dimen name="search_view_margin">8dp</dimen>
     <dimen name="rating_donut_diameter">50dp</dimen>
     <dimen name="rating_donut_translation_z">11dp</dimen>
+    <dimen name="radio_group_button_margin">16dp</dimen>
+    <dimen name="radio_group_text_margin">8dp</dimen>
 </resources>

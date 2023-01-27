@@ -1,5 +1,6 @@
 package com.bolunevdev.kinon.view.fragments
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Fade
 import com.bolunevdev.kinon.R
+import com.bolunevdev.kinon.data.PreferenceProvider
 import com.bolunevdev.kinon.databinding.FragmentHomeBinding
 import com.bolunevdev.kinon.domain.Film
 import com.bolunevdev.kinon.utils.AnimationHelper
@@ -31,7 +33,10 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
     private lateinit var recyclerView: RecyclerView
+    private lateinit var scrollListener: RecyclerView.OnScrollListener
+    private lateinit var sharedChangeListener: SharedPreferences.OnSharedPreferenceChangeListener
     private var isShare: Boolean = false
+    private var totalItemCount = DEFAULT_TOTAL_ITEM_COUNT
     private var filmsDataBase = mutableListOf<Film>()
         //Используем backing field
         set(value) {
@@ -64,24 +69,37 @@ class HomeFragment : Fragment() {
 
         startCircularRevealAnimation()
 
-
         initRV()
 
-        viewModel.filmsListLiveData.observe(viewLifecycleOwner) {
-            filmsDataBase = it.toMutableList()
-            filmsAdapter.updateData(filmsDataBase)
-            isLoading = false
-        }
+        initPullToRefresh()
+
+        loadFilmsDataBase()
 
         initRVTreeObserver()
 
         initSearchView()
 
         addRVScrollListener()
+
+        addSharedPreferencesListener()
+    }
+
+    private fun addSharedPreferencesListener() {
+        sharedChangeListener =
+            SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+                when (key) {
+                    PreferenceProvider.KEY_DEFAULT_CATEGORY -> {
+                        changeCategory()
+                        //Перемещаемся на первую позицию
+                        recyclerView.scrollToPosition(0)
+                    }
+                }
+            }
+        viewModel.addPreferenceListener(sharedChangeListener)
     }
 
     private fun addRVScrollListener() {
-        val scrollListener = object: RecyclerView.OnScrollListener() {
+        scrollListener = object : RecyclerView.OnScrollListener() {
             @Override
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -89,10 +107,11 @@ class HomeFragment : Fragment() {
                 //смотрим сколько элементов на экране
                 val visibleItemCount: Int = layoutManager.childCount
                 //сколько всего элементов
-                val totalItemCount: Int = layoutManager.itemCount
+                totalItemCount = layoutManager.itemCount
 
                 //какая позиция первого элемента
-                val firstVisibleItems = (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                val firstVisibleItems =
+                    (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
 
                 //проверяем, грузим мы что-то или нет
                 if (!isLoading) {
@@ -199,10 +218,41 @@ class HomeFragment : Fragment() {
         favoriteFilms = FavoriteFilms(requireContext(), filmsDataBase)
     }
 
+    private fun loadFilmsDataBase() {
+        viewModel.filmsListLiveData.observe(viewLifecycleOwner) {
+            filmsDataBase = it.toMutableList()
+            filmsAdapter.updateData(filmsDataBase)
+            isLoading = false
+        }
+    }
+
+    private fun changeCategory() {
+        // Очищаем список фильмов
+        viewModel.clearFilmsList()
+        //Делаем новый запрос фильмов на сервер
+        viewModel.getFilmsFromApi()
+    }
+
+    private fun initPullToRefresh() {
+        //Вешаем слушатель, чтобы вызвался pull to refresh
+        binding.pullToRefresh.setOnRefreshListener {
+            changeCategory()
+            //Убираем крутящееся колечко
+            binding.pullToRefresh.isRefreshing = false
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.unregisterPreferencesListener(sharedChangeListener)
+        recyclerView.removeOnScrollListener(scrollListener)
+    }
+
     companion object {
         lateinit var favoriteFilms: FavoriteFilms
-        private const val VISIBLE_THRESHOLD  = 5
+        private const val VISIBLE_THRESHOLD = 5
         private const val DECORATOR_PADDING_IN_DP = 8
         private var isLoading: Boolean = false
+        private const val DEFAULT_TOTAL_ITEM_COUNT = 20
     }
 }

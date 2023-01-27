@@ -51,20 +51,6 @@ class MainActivity : AppCompatActivity() {
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
-        binding.topAppBar.setNavigationOnClickListener {
-            Toast.makeText(this, getString(R.string.btn_menu), Toast.LENGTH_SHORT).show()
-        }
-
-        binding.topAppBar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.settings -> {
-                    Toast.makeText(this, R.string.btn_settings, Toast.LENGTH_SHORT).show()
-                    true
-                }
-                else -> false
-            }
-        }
-
         binding.bottomNavigation.setOnItemReselectedListener {
             if (navController.currentDestination?.parent?.startDestinationId !=
                 navController.currentDestination?.id

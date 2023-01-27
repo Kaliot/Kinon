@@ -37,6 +37,7 @@ class FilmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         Glide.with(itemView)
             //Загружаем сам ресурс
             .load(ApiConstants.IMAGES_URL + IMAGE_SIZE + film.poster)
+            .error(R.drawable.no_poster_holder)
             //Центруем изображение
             .centerCrop()
             //Указываем ImageView, куда будем загружать изображение

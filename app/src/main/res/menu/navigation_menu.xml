@@ -21,4 +21,10 @@
         android:icon="@drawable/ic_baseline_thumb_up_alt"
         android:title="@string/btn_recommended"
         app:showAsAction="withText" />
+
+    <item
+        android:id="@+id/settings_root"
+        android:icon="@drawable/ic_baseline_settings"
+        android:title="@string/btn_settings"
+        app:showAsAction="withText" />
 </menu>

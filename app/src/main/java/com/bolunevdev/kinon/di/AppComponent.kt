@@ -4,6 +4,7 @@ import com.bolunevdev.kinon.di.modules.DatabaseModule
 import com.bolunevdev.kinon.di.modules.DomainModule
 import com.bolunevdev.kinon.di.modules.RemoteModule
 import com.bolunevdev.kinon.viewmodel.HomeFragmentViewModel
+import com.bolunevdev.kinon.viewmodel.SettingsFragmentViewModel
 import dagger.Component
 import javax.inject.Singleton
 
@@ -19,4 +20,7 @@ import javax.inject.Singleton
 interface AppComponent {
     //метод для того, чтобы появилась внедряемые зависимости в HomeFragmentViewModel
     fun inject(homeFragmentViewModel: HomeFragmentViewModel)
+
+    //метод для того, чтобы появилась возможность внедрять зависимости в SettingsFragmentViewModel
+    fun inject(settingsFragmentViewModel: SettingsFragmentViewModel)
 }

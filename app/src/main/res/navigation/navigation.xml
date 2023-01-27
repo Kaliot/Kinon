@@ -77,4 +77,13 @@
             tools:layout="@layout/fragment_recommended" />
     </navigation>
 
+    <navigation android:id="@+id/settings_root"
+        app:startDestination="@id/settings">
+        <fragment
+            android:id="@+id/settings"
+            android:name="com.bolunevdev.kinon.view.fragments.SettingsFragment"
+            android:label="Settings"
+            tools:layout="@layout/fragment_settings" />
+    </navigation>
+
 </navigation>

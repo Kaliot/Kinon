@@ -12,8 +12,7 @@ object Converter {
                 poster = it.posterPath,
                 description = it.overview,
                 rating = it.voteAverage,
-                id = it.id,
-                isInFavorites = false
+                id = it.id
             ))
         }
         return result

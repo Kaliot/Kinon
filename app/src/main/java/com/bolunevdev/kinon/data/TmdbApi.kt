@@ -1,6 +1,6 @@
 package com.bolunevdev.kinon.data
 
-import com.bolunevdev.kinon.data.entity.TmdbResultsDto
+import com.bolunevdev.kinon.data.entity.TmdbResults
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -13,7 +13,7 @@ interface TmdbApi {
         @Query(API_KEY) apiKey: String,
         @Query(LANGUAGE) language: String,
         @Query(PAGE) page: Int
-    ): Call<TmdbResultsDto>
+    ): Call<TmdbResults>
 
     companion object {
         private const val CATEGORY_KEY = "category"

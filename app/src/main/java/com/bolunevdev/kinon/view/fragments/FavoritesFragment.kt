@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Fade
@@ -16,14 +17,28 @@ import com.bolunevdev.kinon.utils.AnimationHelper
 import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
 import com.bolunevdev.kinon.view.rv_adapters.TopSpacingItemDecoration
+import com.bolunevdev.kinon.viewmodel.FavoritesFragmentViewModel
 
 
 class FavoritesFragment : Fragment() {
+    private val viewModel by lazy {
+        ViewModelProvider.NewInstanceFactory().create(FavoritesFragmentViewModel::class.java)
+    }
 
     private lateinit var binding: FragmentFavoritesBinding
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
     private lateinit var recyclerView: RecyclerView
     private var isShare: Boolean = false
+    private var filmsDataBase = mutableListOf<Film>()
+        //Используем backing field
+        set(value) {
+            //Если придет такое же значение, то мы выходим из метода
+            if (field == value) return
+            //Если пришло другое значение, то кладем его в переменную
+            field = value
+            //Обновляем RV адаптер
+            filmsAdapter.updateData(field)
+        }
 
     init {
         reenterTransition = Fade(Fade.IN).apply { duration = MainActivity.TRANSITION_DURATION }
@@ -43,12 +58,11 @@ class FavoritesFragment : Fragment() {
 
         exitTransition = null
 
-        //Получаем список при транзакции фрагмента
-        val favoritesList = HomeFragment.favoriteFilms.getFilms()
-
         startCircularRevealAnimation()
 
-        initRV(favoritesList)
+        initRV()
+
+        loadFilmsDataBase()
 
         initRVTreeObserver()
     }
@@ -74,7 +88,7 @@ class FavoritesFragment : Fragment() {
             }
     }
 
-    private fun initRV(filmsDataBase: MutableList<Film>) {
+    private fun initRV() {
         //находим наш RV
         recyclerView = binding.favoritesRecycler
         recyclerView.apply {
@@ -106,6 +120,18 @@ class FavoritesFragment : Fragment() {
             val decorator = TopSpacingItemDecoration(8)
             addItemDecoration(decorator)
         }
-        filmsAdapter.updateData(filmsDataBase)
+    }
+
+    private fun loadFilmsDataBase() {
+        viewModel.filmsListLiveData.observe(viewLifecycleOwner) {
+            filmsDataBase = it.toMutableList()
+            filmsAdapter.updateData(filmsDataBase)
+        }
+    }
+
+    @Override
+    override fun onResume() {
+        super.onResume()
+        viewModel.getFilmsFromDB()
     }
 }

@@ -9,14 +9,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.transition.Fade
 import androidx.transition.TransitionInflater
 import com.bolunevdev.kinon.R
 import com.bolunevdev.kinon.data.ApiConstants
 import com.bolunevdev.kinon.databinding.FragmentDetailsBinding
 import com.bolunevdev.kinon.domain.Film
-import com.bolunevdev.kinon.utils.FavoriteFilms
 import com.bolunevdev.kinon.view.activities.MainActivity
+import com.bolunevdev.kinon.viewmodel.DetailsFragmentViewModel
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -25,9 +26,20 @@ import com.bumptech.glide.request.target.Target
 
 
 class DetailsFragment : Fragment() {
+
+    private val viewModel by lazy {
+        ViewModelProvider.NewInstanceFactory().create(DetailsFragmentViewModel::class.java)
+    }
     private lateinit var binding: FragmentDetailsBinding
     private lateinit var film: Film
-    private lateinit var favoriteFilms: FavoriteFilms
+    private var favoriteFilms = mutableListOf<Film>()
+        //Используем backing field
+        set(value) {
+            //Если придет такое же значение, то мы выходим из метода
+            if (field == value) return
+            //Если пришло другое значение, то кладем его в переменную
+            field = value
+        }
 
     init {
         enterTransition = Fade(Fade.IN).apply { duration = MainActivity.TRANSITION_DURATION }
@@ -53,27 +65,32 @@ class DetailsFragment : Fragment() {
             .findViewById<FrameLayout>(R.id.background_share_transition)
             .visibility = View.VISIBLE
 
-        favoriteFilms = HomeFragment.favoriteFilms
-
         initSharedElementEnterTransition()
 
         setDetails()
+
+        loadFilmsDataBase()
 
         initDetailsFabShare()
 
         initDetailsFabFavorites()
     }
 
+    private fun loadFilmsDataBase() {
+        viewModel.filmsListLiveData.observe(viewLifecycleOwner) {
+            favoriteFilms = it.toMutableList()
+        }
+    }
+
     private fun initDetailsFabFavorites() {
         binding.detailsFabFavorites.setOnClickListener {
-            if (!favoriteFilms.contains(film)) {
+
+            if (!viewModel.isFilmInFavorites(film.id)) {
                 binding.detailsFabFavorites.setImageResource(R.drawable.ic_baseline_favorite)
-                film.isInFavorites = true
-                favoriteFilms.addFilm(film)
+                viewModel.addToFavoritesFilms(film.id)
             } else {
                 binding.detailsFabFavorites.setImageResource(R.drawable.ic_baseline_favorite_border_24)
-                film.isInFavorites = false
-                favoriteFilms.deleteFilm(film)
+                viewModel.deleteFromFavoritesFilms(film.id)
             }
         }
     }
@@ -151,7 +168,7 @@ class DetailsFragment : Fragment() {
         binding.detailsDescription.text = film.description
 
         binding.detailsFabFavorites.setImageResource(
-            if (favoriteFilms.contains(film)) R.drawable.ic_baseline_favorite
+            if (viewModel.isFilmInFavorites(film.id)) R.drawable.ic_baseline_favorite
             else R.drawable.ic_baseline_favorite_border_24
         )
     }

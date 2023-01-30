@@ -17,7 +17,6 @@ import com.bolunevdev.kinon.data.PreferenceProvider
 import com.bolunevdev.kinon.databinding.FragmentHomeBinding
 import com.bolunevdev.kinon.domain.Film
 import com.bolunevdev.kinon.utils.AnimationHelper
-import com.bolunevdev.kinon.utils.FavoriteFilms
 import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
 import com.bolunevdev.kinon.view.rv_adapters.TopSpacingItemDecoration
@@ -46,7 +45,6 @@ class HomeFragment : Fragment() {
             field = value
             //Обновляем RV адаптер
             filmsAdapter.updateData(field)
-            createFavoriteFilmsDataBase()
         }
 
     init {
@@ -214,10 +212,6 @@ class HomeFragment : Fragment() {
         isShare = false
     }
 
-    private fun createFavoriteFilmsDataBase() {
-        favoriteFilms = FavoriteFilms(requireContext(), filmsDataBase)
-    }
-
     private fun loadFilmsDataBase() {
         viewModel.filmsListLiveData.observe(viewLifecycleOwner) {
             filmsDataBase = it.toMutableList()
@@ -249,7 +243,6 @@ class HomeFragment : Fragment() {
     }
 
     companion object {
-        lateinit var favoriteFilms: FavoriteFilms
         private const val VISIBLE_THRESHOLD = 5
         private const val DECORATOR_PADDING_IN_DP = 8
         private var isLoading: Boolean = false

@@ -44,10 +44,19 @@ class PreferenceProvider(context: Context) {
         preference.unregisterOnSharedPreferenceChangeListener(listener)
     }
 
+    fun setTimeOfDatabaseUpdate(time: Long) {
+        preference.edit { putLong(KEY_TIME_DB_UPDATE, time) }
+    }
+
+    fun getTimeOfDatabaseUpdate(): Long {
+        return preference.getLong(KEY_TIME_DB_UPDATE, 0)
+    }
+
     //Ключи для наших настроек, по ним мы их будем получать
     companion object {
         private const val KEY_SETTINGS_PREFERENCES = "settings"
         private const val KEY_FIRST_LAUNCH = "first_launch"
+        private const val KEY_TIME_DB_UPDATE = "time_db_update"
         const val KEY_DEFAULT_CATEGORY = "default_category"
         private const val DEFAULT_CATEGORY = "popular"
     }

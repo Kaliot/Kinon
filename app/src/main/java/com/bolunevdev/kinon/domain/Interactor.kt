@@ -1,10 +1,8 @@
 package com.bolunevdev.kinon.domain
 
 import android.content.SharedPreferences
-import com.bolunevdev.kinon.data.API
-import com.bolunevdev.kinon.data.MainRepository
-import com.bolunevdev.kinon.data.PreferenceProvider
-import com.bolunevdev.kinon.data.TmdbApi
+import com.bolunevdev.kinon.data.*
+import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.data.entity.TmdbResults
 import com.bolunevdev.kinon.utils.Converter
 import com.bolunevdev.kinon.viewmodel.HomeFragmentViewModel
@@ -14,6 +12,7 @@ import retrofit2.Response
 
 class Interactor(
     private val repo: MainRepository,
+    private val favoriteRepository: FavoriteRepository,
     private val retrofitService: TmdbApi,
     private val preferences: PreferenceProvider
 ) {
@@ -29,10 +28,29 @@ class Interactor(
                 ) {
                     //При успехе мы вызываем метод, передаем onSuccess и в этот коллбэк список фильмов
                     val list = Converter.convertApiListToDtoList(response.body()?.results)
-                    //Кладем фильмы в бд
-                    list.forEach {
-                        repo.putToDb(film = it)
-                    }
+                    //Кладём фильмы в БД
+                    repo.putToDb(list)
+                    callback.onSuccess(list)
+                }
+
+                override fun onFailure(call: Call<TmdbResults>, t: Throwable) {
+                    //В случае провала вызываем другой метод коллбека
+                    callback.onFailure()
+                }
+            })
+    }
+
+    fun tryToUpdateFilmsFromDB(callback: HomeFragmentViewModel.ApiCallback) {
+        //Метод getDefaultCategoryFromPreferences() будет нам получать при каждом запросе нужный нам список фильмов
+        retrofitService.getFilms(getDefaultCategoryFromPreferences(), API.KEY, "ru-RU", 1)
+            .enqueue(object : Callback<TmdbResults> {
+                override fun onResponse(
+                    call: Call<TmdbResults>,
+                    response: Response<TmdbResults>
+                ) {
+                    //При успехе мы вызываем метод, передаем onSuccess и в этот коллбэк список фильмов
+                    val list = Converter.convertApiListToDtoList(response.body()?.results)
+                    repo.updateDb(list)
                     callback.onSuccess(list)
                 }
 
@@ -47,9 +65,6 @@ class Interactor(
 
     //Метод ля очистки базы данных
     fun deleteAllFromDB() = repo.deleteAllFromDB()
-
-    //Метод ля удаления фильма из базы данных по Id
-    fun deleteFilmFromDB(id: Int) = repo.deleteFilmFromDB(id)
 
     //Метод для сохранения настроек
     fun saveDefaultCategoryToPreferences(category: String) {
@@ -69,13 +84,14 @@ class Interactor(
         preferences.unregisterSharedPreferencesCategoryChangeListener(listener)
     }
 
-    fun getFavoritesFilmsFromDB(): List<Film> = repo.getAllFavoritesFilmsFromDB()
+    fun setTimeOfUpdate(time: Long) = preferences.setTimeOfDatabaseUpdate(time)
 
-    fun setFilmAsFavoriteInDB(id: Int) = repo.setFilmAsFavoriteInDB(id)
+    fun getTimeOfUpdate(): Long = preferences.getTimeOfDatabaseUpdate()
 
-    fun setFilmAsNotFavoriteInDB(id: Int) = repo.setFilmAsNotFavoriteInDB(id)
+    fun getFavoritesFilmsFromDB(): List<Film> = favoriteRepository.getAllFavoritesFilmsFromDB()
 
-    fun isFilmInFavorites(id: Int): Boolean = repo.isFilmInFavorites(id)
+    fun setFilmAsFavoriteInDB(film: Film) = favoriteRepository.setFilmAsFavoriteInDB(film)
 
-
+    //Метод ля удаления фильма из базы данных по Id
+    fun setFilmAsNotFavoriteInDB(id: Int) = favoriteRepository.setFilmAsNotFavoriteInDB(id)
 }

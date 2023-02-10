@@ -42,7 +42,7 @@ android {
 dependencies {
     // AndroidX
     implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.6.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation "androidx.fragment:fragment-ktx:1.5.5"
@@ -55,6 +55,7 @@ dependencies {
 
     // Glide
     implementation 'com.github.bumptech.glide:glide:4.12.0'
+    implementation 'androidx.core:core-ktx:1.9.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
 
     // Lottie
@@ -76,4 +77,9 @@ dependencies {
     //Dagger
     implementation 'com.google.dagger:dagger:2.44.2'
     kapt 'com.google.dagger:dagger-compiler:2.37'
+
+    //Room
+//    def room_version = "2.2.6"
+    implementation "androidx.room:room-runtime:2.5.0"
+    kapt "androidx.room:room-compiler:2.5.0"
 }

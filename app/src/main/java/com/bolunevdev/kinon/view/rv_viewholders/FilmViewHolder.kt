@@ -12,7 +12,7 @@ import androidx.transition.TransitionSet
 import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
 import com.bolunevdev.kinon.R
 import com.bolunevdev.kinon.data.ApiConstants
-import com.bolunevdev.kinon.domain.Film
+import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.view.customviews.RatingDonutView
 import com.bumptech.glide.Glide

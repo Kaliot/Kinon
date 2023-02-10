@@ -8,14 +8,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Fade
 import com.bolunevdev.kinon.R
 import com.bolunevdev.kinon.data.PreferenceProvider
+import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.databinding.FragmentHomeBinding
-import com.bolunevdev.kinon.domain.Film
 import com.bolunevdev.kinon.utils.AnimationHelper
 import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
@@ -25,10 +25,7 @@ import java.util.*
 
 
 class HomeFragment : Fragment() {
-
-    private val viewModel by lazy {
-        ViewModelProvider.NewInstanceFactory().create(HomeFragmentViewModel::class.java)
-    }
+    private val viewModel: HomeFragmentViewModel by activityViewModels()
     private lateinit var binding: FragmentHomeBinding
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
     private lateinit var recyclerView: RecyclerView
@@ -127,9 +124,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun initRVTreeObserver() {
-        recyclerView.viewTreeObserver
-            .addOnDrawListener {
+        binding.mainRecycler.viewTreeObserver
+            .addOnPreDrawListener {
                 startPostponedEnterTransition()
+                true
             }
     }
 

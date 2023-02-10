@@ -3,12 +3,13 @@ package com.bolunevdev.kinon.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bolunevdev.kinon.App
-import com.bolunevdev.kinon.domain.Film
+import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.domain.Interactor
+import java.util.concurrent.Executors
 import javax.inject.Inject
 
 class DetailsFragmentViewModel : ViewModel() {
-    val filmsListLiveData: MutableLiveData<List<Film>> = MutableLiveData()
+    val filmsListLiveData = MutableLiveData<List<Film>>()
 
     //Инициализируем интерактор
     @Inject
@@ -20,18 +21,22 @@ class DetailsFragmentViewModel : ViewModel() {
     }
 
     private fun getFavoritesFilms() {
-        filmsListLiveData.postValue(interactor.getFavoritesFilmsFromDB())
+        Executors.newSingleThreadExecutor().execute {
+            filmsListLiveData.postValue(interactor.getFavoritesFilmsFromDB())
+        }
     }
 
-    fun isFilmInFavorites(id: Int): Boolean = interactor.isFilmInFavorites(id)
-
-    fun addToFavoritesFilms(id: Int) {
-        interactor.setFilmAsFavoriteInDB(id)
-        getFavoritesFilms()
+    fun addToFavoritesFilms(film: Film) {
+        Executors.newSingleThreadExecutor().execute {
+            interactor.setFilmAsFavoriteInDB(film)
+            getFavoritesFilms()
+        }
     }
 
     fun deleteFromFavoritesFilms(id: Int) {
-        interactor.setFilmAsNotFavoriteInDB(id)
-        getFavoritesFilms()
+        Executors.newSingleThreadExecutor().execute {
+            interactor.setFilmAsNotFavoriteInDB(id)
+            getFavoritesFilms()
+        }
     }
 }

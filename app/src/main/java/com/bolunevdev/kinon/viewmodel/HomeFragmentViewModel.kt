@@ -4,8 +4,9 @@ import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bolunevdev.kinon.App
-import com.bolunevdev.kinon.domain.Film
+import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.domain.Interactor
+import java.util.concurrent.Executors
 import javax.inject.Inject
 
 
@@ -21,7 +22,25 @@ class HomeFragmentViewModel : ViewModel() {
 
     init {
         App.instance.dagger.inject(this)
-        getFilmsFromApi()
+        getFilms()
+    }
+
+    private fun getFilms() {
+        if (isDatabaseNeedToUpdate()) {
+            interactor.tryToUpdateFilmsFromDB(object : ApiCallback {
+                override fun onSuccess(films: List<Film>) {
+                    filmsList.addAll(films)
+                    filmsListLiveData.postValue(filmsList)
+                    setNewTimeOfDatabaseUpdate()
+                }
+
+                override fun onFailure() {
+                    loadFilmsFromDB()
+                }
+            })
+        } else {
+            loadFilmsFromDB()
+        }
     }
 
     fun getFilmsFromApi() {
@@ -32,7 +51,7 @@ class HomeFragmentViewModel : ViewModel() {
             }
 
             override fun onFailure() {
-                filmsListLiveData.postValue(interactor.getFilmsFromDB())
+                loadFilmsFromDB()
             }
         })
     }
@@ -43,6 +62,7 @@ class HomeFragmentViewModel : ViewModel() {
 
     fun clearFilmsList() {
         filmsList.clear()
+        interactor.deleteAllFromDB()
         pageNumber = 1
     }
 
@@ -54,8 +74,31 @@ class HomeFragmentViewModel : ViewModel() {
         interactor.unregisterSharedPreferencesCategoryChangeListener(listener)
     }
 
+    private fun loadFilmsFromDB() {
+        Executors.newSingleThreadExecutor().execute {
+            filmsList.addAll(interactor.getFilmsFromDB())
+            filmsListLiveData.postValue(filmsList)
+        }
+    }
+
+    private fun setNewTimeOfDatabaseUpdate() {
+        interactor.setTimeOfUpdate(System.currentTimeMillis())
+    }
+
+    private fun getTimeOfDatabaseUpdate() = interactor.getTimeOfUpdate()
+
+    private fun isDatabaseNeedToUpdate(): Boolean {
+        val lastTime = getTimeOfDatabaseUpdate()
+        val currentTime = System.currentTimeMillis()
+        return currentTime - lastTime >= DEFAULT_TIME
+    }
+
     interface ApiCallback {
         fun onSuccess(films: List<Film>)
         fun onFailure()
+    }
+
+    companion object {
+        const val DEFAULT_TIME = 600_000L
     }
 }

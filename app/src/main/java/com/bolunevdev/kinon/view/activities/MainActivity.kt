@@ -13,13 +13,12 @@ import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.bolunevdev.kinon.R
+import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.databinding.ActivityMainBinding
-import com.bolunevdev.kinon.domain.Film
 import com.bolunevdev.kinon.view.fragments.DetailsFragment
 
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private lateinit var navHostFragment: NavHostFragment
@@ -95,7 +94,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val KEY_FILM_DETAILS_FRAGMENT = "film"
-        const val FAVORITE_FILMS_PREFERENCES = "FAVORITE_FILMS_PREFERENCES"
         const val FILM_TITLE = "FILM_TITLE"
         const val TRANSITION_DURATION = 400L
         const val TRANSITION_DURATION_FAST = 150L

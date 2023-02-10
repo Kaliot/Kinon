@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Fade
 import com.bolunevdev.kinon.R
+import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.databinding.FragmentFavoritesBinding
-import com.bolunevdev.kinon.domain.Film
 import com.bolunevdev.kinon.utils.AnimationHelper
 import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
@@ -117,7 +117,7 @@ class FavoritesFragment : Fragment() {
             recyclerView.layoutManager = layoutManager
 
             //Применяем декоратор для отступов
-            val decorator = TopSpacingItemDecoration(8)
+            val decorator = TopSpacingItemDecoration(DECORATOR_PADDING_IN_DP)
             addItemDecoration(decorator)
         }
     }
@@ -133,5 +133,9 @@ class FavoritesFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         viewModel.getFilmsFromDB()
+    }
+
+    companion object {
+        private const val DECORATOR_PADDING_IN_DP = 8
     }
 }

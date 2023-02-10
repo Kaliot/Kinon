@@ -1,6 +1,7 @@
 package com.bolunevdev.kinon.di.modules
 
 import android.content.Context
+import com.bolunevdev.kinon.data.FavoriteRepository
 import com.bolunevdev.kinon.data.MainRepository
 import com.bolunevdev.kinon.data.PreferenceProvider
 import com.bolunevdev.kinon.data.TmdbApi
@@ -25,7 +26,13 @@ class DomainModule(val context: Context) {
     @Provides
     fun provideInteractor(
         repository: MainRepository,
+        favoriteRepository: FavoriteRepository,
         tmdbApi: TmdbApi,
         preferenceProvider: PreferenceProvider
-    ) = Interactor(repo = repository, retrofitService = tmdbApi, preferences = preferenceProvider)
+    ) = Interactor(
+        repo = repository,
+        favoriteRepository = favoriteRepository,
+        retrofitService = tmdbApi,
+        preferences = preferenceProvider
+    )
 }

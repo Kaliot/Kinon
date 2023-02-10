@@ -3,8 +3,9 @@ package com.bolunevdev.kinon.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bolunevdev.kinon.App
-import com.bolunevdev.kinon.domain.Film
+import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.domain.Interactor
+import java.util.concurrent.Executors
 import javax.inject.Inject
 
 class FavoritesFragmentViewModel : ViewModel() {
@@ -20,6 +21,8 @@ class FavoritesFragmentViewModel : ViewModel() {
     }
 
     fun getFilmsFromDB() {
-        filmsListLiveData.postValue(interactor.getFavoritesFilmsFromDB())
+        Executors.newSingleThreadExecutor().execute {
+            filmsListLiveData.postValue(interactor.getFavoritesFilmsFromDB())
+        }
     }
 }

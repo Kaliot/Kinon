@@ -1,6 +1,6 @@
 package com.bolunevdev.kinon.viewmodel
 
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.bolunevdev.kinon.App
 import com.bolunevdev.kinon.data.entity.Film
@@ -9,7 +9,7 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 
 class DetailsFragmentViewModel : ViewModel() {
-    val filmsListLiveData = MutableLiveData<List<Film>>()
+    val filmsListLiveData: LiveData<List<Film>>
 
     //Инициализируем интерактор
     @Inject
@@ -17,26 +17,18 @@ class DetailsFragmentViewModel : ViewModel() {
 
     init {
         App.instance.dagger.inject(this)
-        getFavoritesFilms()
-    }
-
-    private fun getFavoritesFilms() {
-        Executors.newSingleThreadExecutor().execute {
-            filmsListLiveData.postValue(interactor.getFavoritesFilmsFromDB())
-        }
+        filmsListLiveData = interactor.getFavoritesFilmsFromDB()
     }
 
     fun addToFavoritesFilms(film: Film) {
         Executors.newSingleThreadExecutor().execute {
             interactor.setFilmAsFavoriteInDB(film)
-            getFavoritesFilms()
         }
     }
 
     fun deleteFromFavoritesFilms(id: Int) {
         Executors.newSingleThreadExecutor().execute {
             interactor.setFilmAsNotFavoriteInDB(id)
-            getFavoritesFilms()
         }
     }
 }

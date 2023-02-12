@@ -1,5 +1,6 @@
 package com.bolunevdev.kinon.data.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.bolunevdev.kinon.data.entity.Film
 
@@ -7,7 +8,7 @@ import com.bolunevdev.kinon.data.entity.Film
 interface FilmDao {
     //Запрос на всю таблицу
     @Query("SELECT * FROM cached_films")
-    fun getCachedFilms(): List<Film>
+    fun getCachedFilms(): LiveData<List<Film>>
 
     //Кладём списком в БД, в случае конфликта перезаписываем
     @Insert(onConflict = OnConflictStrategy.REPLACE)

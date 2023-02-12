@@ -23,4 +23,6 @@
     <dimen name="rating_donut_translation_z">11dp</dimen>
     <dimen name="radio_group_button_margin">16dp</dimen>
     <dimen name="radio_group_text_margin">8dp</dimen>
+    <dimen name="progress_bar_width">100dp</dimen>
+    <dimen name="progress_bar_height">100dp</dimen>
 </resources>

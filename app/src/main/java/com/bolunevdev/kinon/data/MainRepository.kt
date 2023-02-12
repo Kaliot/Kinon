@@ -1,5 +1,6 @@
 package com.bolunevdev.kinon.data
 
+import androidx.lifecycle.LiveData
 import com.bolunevdev.kinon.data.dao.FilmDao
 import com.bolunevdev.kinon.data.entity.Film
 import java.util.concurrent.Executors
@@ -12,9 +13,7 @@ class MainRepository(private val filmDao: FilmDao) {
         }
     }
 
-    fun getAllFromDB(): List<Film> {
-        return filmDao.getCachedFilms()
-    }
+    fun getAllFromDB(): LiveData<List<Film>> = filmDao.getCachedFilms()
 
     fun updateDb(films: List<Film>) {
         Executors.newSingleThreadExecutor().execute {

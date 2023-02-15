@@ -1,18 +1,20 @@
 package com.bolunevdev.kinon.viewmodel
 
 import android.content.SharedPreferences
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bolunevdev.kinon.App
 import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.domain.Interactor
-import java.util.concurrent.Executors
+import com.bolunevdev.kinon.utils.SingleLiveEvent
 import javax.inject.Inject
 
 
 class HomeFragmentViewModel : ViewModel() {
-    val filmsListLiveData: MutableLiveData<List<Film>> = MutableLiveData()
-    private val filmsList = mutableListOf<Film>()
+    val filmsListLiveData: LiveData<List<Film>>
+    val showProgressBar: MutableLiveData<Boolean> = MutableLiveData()
+    val serverErrorEvent = SingleLiveEvent<String>()
 
     //Инициализируем интерактор
     @Inject
@@ -22,38 +24,43 @@ class HomeFragmentViewModel : ViewModel() {
 
     init {
         App.instance.dagger.inject(this)
+        filmsListLiveData = interactor.getFilmsFromDB()
         getFilms()
     }
 
     private fun getFilms() {
         if (isDatabaseNeedToUpdate()) {
+            showProgressBar.postValue(true)
             interactor.tryToUpdateFilmsFromDB(object : ApiCallback {
-                override fun onSuccess(films: List<Film>) {
-                    filmsList.addAll(films)
-                    filmsListLiveData.postValue(filmsList)
+                override fun onSuccess() {
                     setNewTimeOfDatabaseUpdate()
+                    showProgressBar.postValue(false)
                 }
 
                 override fun onFailure() {
-                    loadFilmsFromDB()
+                    showProgressBar.postValue(false)
+                    postServerError()
                 }
             })
-        } else {
-            loadFilmsFromDB()
         }
     }
 
     fun getFilmsFromApi() {
+        showProgressBar.postValue(true)
         interactor.getFilmsFromApi(pageNumber, object : ApiCallback {
-            override fun onSuccess(films: List<Film>) {
-                filmsList.addAll(films)
-                filmsListLiveData.postValue(filmsList)
+            override fun onSuccess() {
+                showProgressBar.postValue(false)
             }
 
             override fun onFailure() {
-                loadFilmsFromDB()
+                showProgressBar.postValue(false)
+                postServerError()
             }
         })
+    }
+
+    fun postServerError() {
+        serverErrorEvent.postValue(SERVER_ERROR_MESSAGE)
     }
 
     fun addPreferenceListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
@@ -61,7 +68,6 @@ class HomeFragmentViewModel : ViewModel() {
     }
 
     fun clearFilmsList() {
-        filmsList.clear()
         interactor.deleteAllFromDB()
         pageNumber = 1
     }
@@ -72,13 +78,6 @@ class HomeFragmentViewModel : ViewModel() {
 
     fun unregisterPreferencesListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
         interactor.unregisterSharedPreferencesCategoryChangeListener(listener)
-    }
-
-    private fun loadFilmsFromDB() {
-        Executors.newSingleThreadExecutor().execute {
-            filmsList.addAll(interactor.getFilmsFromDB())
-            filmsListLiveData.postValue(filmsList)
-        }
     }
 
     private fun setNewTimeOfDatabaseUpdate() {
@@ -94,11 +93,12 @@ class HomeFragmentViewModel : ViewModel() {
     }
 
     interface ApiCallback {
-        fun onSuccess(films: List<Film>)
+        fun onSuccess()
         fun onFailure()
     }
 
     companion object {
         const val DEFAULT_TIME = 600_000L
+        const val SERVER_ERROR_MESSAGE = "Не удалось получить данные с сервера!"
     }
 }

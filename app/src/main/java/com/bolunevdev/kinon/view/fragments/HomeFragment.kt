@@ -6,7 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -77,6 +79,22 @@ class HomeFragment : Fragment() {
         addRVScrollListener()
 
         addSharedPreferencesListener()
+
+        setProgressBar()
+
+        setServerErrorToast()
+    }
+
+    private fun setProgressBar() {
+        viewModel.showProgressBar.observe(viewLifecycleOwner) {
+            binding.progressBar.isVisible = it
+        }
+    }
+
+    private fun setServerErrorToast() {
+        viewModel.serverErrorEvent.observe(viewLifecycleOwner) {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun addSharedPreferencesListener() {
@@ -228,7 +246,7 @@ class HomeFragment : Fragment() {
     private fun initPullToRefresh() {
         //Вешаем слушатель, чтобы вызвался pull to refresh
         binding.pullToRefresh.setOnRefreshListener {
-            changeCategory()
+            viewModel.getFilmsFromApi()
             //Убираем крутящееся колечко
             binding.pullToRefresh.isRefreshing = false
         }

@@ -1,6 +1,7 @@
 package com.bolunevdev.kinon.domain
 
 import android.content.SharedPreferences
+import androidx.lifecycle.LiveData
 import com.bolunevdev.kinon.data.*
 import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.data.entity.TmdbResults
@@ -30,7 +31,7 @@ class Interactor(
                     val list = Converter.convertApiListToDtoList(response.body()?.results)
                     //Кладём фильмы в БД
                     repo.putToDb(list)
-                    callback.onSuccess(list)
+                    callback.onSuccess()
                 }
 
                 override fun onFailure(call: Call<TmdbResults>, t: Throwable) {
@@ -51,7 +52,7 @@ class Interactor(
                     //При успехе мы вызываем метод, передаем onSuccess и в этот коллбэк список фильмов
                     val list = Converter.convertApiListToDtoList(response.body()?.results)
                     repo.updateDb(list)
-                    callback.onSuccess(list)
+                    callback.onSuccess()
                 }
 
                 override fun onFailure(call: Call<TmdbResults>, t: Throwable) {
@@ -61,7 +62,7 @@ class Interactor(
             })
     }
 
-    fun getFilmsFromDB(): List<Film> = repo.getAllFromDB()
+    fun getFilmsFromDB(): LiveData<List<Film>> = repo.getAllFromDB()
 
     //Метод ля очистки базы данных
     fun deleteAllFromDB() = repo.deleteAllFromDB()
@@ -88,7 +89,8 @@ class Interactor(
 
     fun getTimeOfUpdate(): Long = preferences.getTimeOfDatabaseUpdate()
 
-    fun getFavoritesFilmsFromDB(): List<Film> = favoriteRepository.getAllFavoritesFilmsFromDB()
+    fun getFavoritesFilmsFromDB(): LiveData<List<Film>> =
+        favoriteRepository.getAllFavoritesFilmsFromDB()
 
     fun setFilmAsFavoriteInDB(film: Film) = favoriteRepository.setFilmAsFavoriteInDB(film)
 

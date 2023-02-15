@@ -71,9 +71,11 @@ class FavoritesFragment : Fragment() {
         if (!isShare) {
             val menuPosition = 3
             AnimationHelper
-                .performFragmentCircularRevealAnimation(binding.root,
+                .performFragmentCircularRevealAnimation(
+                    binding.root,
                     requireActivity(),
-                    menuPosition)
+                    menuPosition
+                )
             return
         }
         binding.root.visibility = View.VISIBLE
@@ -127,12 +129,6 @@ class FavoritesFragment : Fragment() {
             filmsDataBase = it.toMutableList()
             filmsAdapter.updateData(filmsDataBase)
         }
-    }
-
-    @Override
-    override fun onResume() {
-        super.onResume()
-        viewModel.getFilmsFromDB()
     }
 
     companion object {

@@ -25,4 +25,8 @@
     <dimen name="radio_group_text_margin">8dp</dimen>
     <dimen name="progress_bar_width">100dp</dimen>
     <dimen name="progress_bar_height">100dp</dimen>
+    <dimen name="fab_download_translationX">72dp</dimen>
+    <dimen name="details_progress_bar_width">50dp</dimen>
+    <dimen name="details_progress_bar_translationZ">10dp</dimen>
+    <dimen name="details_progress_bar_height">50dp</dimen>
 </resources>

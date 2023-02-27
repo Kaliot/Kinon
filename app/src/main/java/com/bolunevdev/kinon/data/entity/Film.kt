@@ -16,7 +16,17 @@ data class Film(
     @ColumnInfo(name = "overview") val description: String,
     @ColumnInfo(name = "vote_average") var rating: Double = 0.0, //Приходит нецелое число с API
     @ColumnInfo(name = "film_id") var filmId: Int
-) : Parcelable
+) : Parcelable {
+
+    override fun equals(other: Any?) =
+        (other is Film) && (title == other.title) && (filmId == other.filmId)
+
+    override fun hashCode(): Int {
+        var result = title.hashCode()
+        result = 31 * result + filmId
+        return result
+    }
+}
 
 
 

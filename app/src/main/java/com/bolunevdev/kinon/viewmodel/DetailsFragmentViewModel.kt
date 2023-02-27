@@ -2,11 +2,11 @@ package com.bolunevdev.kinon.viewmodel
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.bolunevdev.kinon.App
 import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.domain.Interactor
+import kotlinx.coroutines.flow.Flow
 import java.net.URL
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -14,7 +14,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class DetailsFragmentViewModel : ViewModel() {
-    val filmsListLiveData: LiveData<List<Film>>
+    val filmsListFlow: Flow<List<Film>>
 
     //Инициализируем интерактор
     @Inject
@@ -22,13 +22,11 @@ class DetailsFragmentViewModel : ViewModel() {
 
     init {
         App.instance.dagger.inject(this)
-        filmsListLiveData = interactor.getFavoritesFilmsFromDB()
+        filmsListFlow = interactor.getFavoritesFilmsFromDB()
     }
 
     fun addToFavoritesFilms(film: Film) {
-        Executors.newSingleThreadExecutor().execute {
-            interactor.setFilmAsFavoriteInDB(film)
-        }
+        interactor.setFilmAsFavoriteInDB(film)
     }
 
     fun deleteFromFavoritesFilms(id: Int) {

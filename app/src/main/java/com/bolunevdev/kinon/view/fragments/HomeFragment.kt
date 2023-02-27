@@ -23,6 +23,7 @@ import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
 import com.bolunevdev.kinon.view.rv_adapters.TopSpacingItemDecoration
 import com.bolunevdev.kinon.viewmodel.HomeFragmentViewModel
+import kotlinx.coroutines.*
 import java.util.*
 
 
@@ -32,9 +33,19 @@ class HomeFragment : Fragment() {
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var scrollListener: RecyclerView.OnScrollListener
-    private lateinit var sharedChangeListener: SharedPreferences.OnSharedPreferenceChangeListener
     private var isShare: Boolean = false
     private var totalItemCount = DEFAULT_TOTAL_ITEM_COUNT
+    private lateinit var scope: CoroutineScope
+    private val sharedChangeListener =
+        SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            when (key) {
+                PreferenceProvider.KEY_DEFAULT_CATEGORY -> {
+                    changeCategory()
+                    //Перемещаемся на первую позицию
+                    recyclerView.scrollToPosition(0)
+                }
+            }
+        }
     private var filmsDataBase = mutableListOf<Film>()
         //Используем backing field
         set(value) {
@@ -55,7 +66,6 @@ class HomeFragment : Fragment() {
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         postponeEnterTransition()
-
         return binding.root
     }
 
@@ -86,28 +96,29 @@ class HomeFragment : Fragment() {
     }
 
     private fun setProgressBar() {
-        viewModel.showProgressBar.observe(viewLifecycleOwner) {
-            binding.progressBar.isVisible = it
+        scope.launch {
+            withContext(Dispatchers.Main) {
+                for (element in viewModel.showProgressBar) {
+                    binding.progressBar.isVisible = element
+                }
+            }
         }
     }
 
     private fun setServerErrorToast() {
+        scope.launch {
+            withContext(Dispatchers.Main) {
+                for (element in viewModel.showServerError) {
+                    if (element) viewModel.postServerError()
+                }
+            }
+        }
         viewModel.serverErrorEvent.observe(viewLifecycleOwner) {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun addSharedPreferencesListener() {
-        sharedChangeListener =
-            SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-                when (key) {
-                    PreferenceProvider.KEY_DEFAULT_CATEGORY -> {
-                        changeCategory()
-                        //Перемещаемся на первую позицию
-                        recyclerView.scrollToPosition(0)
-                    }
-                }
-            }
         viewModel.addPreferenceListener(sharedChangeListener)
     }
 
@@ -229,10 +240,15 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadFilmsDataBase() {
-        viewModel.filmsListLiveData.observe(viewLifecycleOwner) {
-            filmsDataBase = it.toMutableList()
-            filmsAdapter.updateData(filmsDataBase)
-            isLoading = false
+        scope = CoroutineScope(Dispatchers.IO)
+        scope.launch {
+            viewModel.filmsListFlow.collect {
+                withContext(Dispatchers.Main) {
+                    filmsDataBase = it as MutableList<Film>
+                    filmsAdapter.updateData(filmsDataBase)
+                    isLoading = false
+                }
+            }
         }
     }
 
@@ -246,16 +262,21 @@ class HomeFragment : Fragment() {
     private fun initPullToRefresh() {
         //Вешаем слушатель, чтобы вызвался pull to refresh
         binding.pullToRefresh.setOnRefreshListener {
-            viewModel.getFilmsFromApi()
+            changeCategory()
             //Убираем крутящееся колечко
             binding.pullToRefresh.isRefreshing = false
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        recyclerView.removeOnScrollListener(scrollListener)
+        scope.cancel()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         viewModel.unregisterPreferencesListener(sharedChangeListener)
-        recyclerView.removeOnScrollListener(scrollListener)
     }
 
     companion object {

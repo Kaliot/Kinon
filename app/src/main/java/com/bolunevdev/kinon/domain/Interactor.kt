@@ -1,12 +1,16 @@
 package com.bolunevdev.kinon.domain
 
 import android.content.SharedPreferences
-import androidx.lifecycle.LiveData
 import com.bolunevdev.kinon.data.*
 import com.bolunevdev.kinon.data.entity.Film
+import com.bolunevdev.kinon.data.entity.TmdbFilm
 import com.bolunevdev.kinon.data.entity.TmdbResults
-import com.bolunevdev.kinon.utils.Converter
-import com.bolunevdev.kinon.viewmodel.HomeFragmentViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -17,9 +21,14 @@ class Interactor(
     private val retrofitService: TmdbApi,
     private val preferences: PreferenceProvider
 ) {
-    //В конструктор мы будем передавать коллбэк из вью модели, чтобы реагировать на то, когда фильмы будут получены
-    //и страницу, которую нужно загрузить (это для пагинации)
-    fun getFilmsFromApi(page: Int, callback: HomeFragmentViewModel.ApiCallback) {
+    private val scope = CoroutineScope(Dispatchers.IO)
+    val progressBarChannel = Channel<Boolean>(Channel.CONFLATED)
+    val serverErrorChannel = Channel<Boolean>(Channel.CONFLATED)
+
+    //В конструктор мы будем передавать страницу, которую нужно загрузить (это для пагинации)
+    fun getFilmsFromApi(page: Int) {
+        showProgressBar(true)
+        showServerError(false)
         //Метод getDefaultCategoryFromPreferences() будет нам получать при каждом запросе нужный нам список фильмов
         retrofitService.getFilms(getDefaultCategoryFromPreferences(), API.KEY, "ru-RU", page)
             .enqueue(object : Callback<TmdbResults> {
@@ -27,45 +36,51 @@ class Interactor(
                     call: Call<TmdbResults>,
                     response: Response<TmdbResults>
                 ) {
-                    //При успехе мы вызываем метод, передаем onSuccess и в этот коллбэк список фильмов
-                    val list = Converter.convertApiListToDtoList(response.body()?.results)
-                    //Кладём фильмы в БД
-                    repo.putToDb(list)
-                    callback.onSuccess()
+                    val apiList = response.body()?.results ?: emptyList()
+                    if (apiList.isNotEmpty()) {
+                        scope.launch {
+                            //Кладём фильмы в БД
+                            mapTmdbFilmsToFilmsWithFlow(apiList).collect {
+                                repo.putToDb(it)
+                            }
+                            progressBarChannel.send(false)
+                        }
+                        showServerError(false)
+                    } else {
+                        showProgressBar(false)
+                        showServerError(true)
+                    }
                 }
 
                 override fun onFailure(call: Call<TmdbResults>, t: Throwable) {
-                    //В случае провала вызываем другой метод коллбека
-                    callback.onFailure()
+                    showProgressBar(false)
+                    showServerError(true)
                 }
             })
     }
 
-    fun tryToUpdateFilmsFromDB(callback: HomeFragmentViewModel.ApiCallback) {
-        //Метод getDefaultCategoryFromPreferences() будет нам получать при каждом запросе нужный нам список фильмов
-        retrofitService.getFilms(getDefaultCategoryFromPreferences(), API.KEY, "ru-RU", 1)
-            .enqueue(object : Callback<TmdbResults> {
-                override fun onResponse(
-                    call: Call<TmdbResults>,
-                    response: Response<TmdbResults>
-                ) {
-                    //При успехе мы вызываем метод, передаем onSuccess и в этот коллбэк список фильмов
-                    val list = Converter.convertApiListToDtoList(response.body()?.results)
-                    repo.updateDb(list)
-                    callback.onSuccess()
-                }
-
-                override fun onFailure(call: Call<TmdbResults>, t: Throwable) {
-                    //В случае провала вызываем другой метод коллбека
-                    callback.onFailure()
-                }
+    private fun mapTmdbFilmsToFilmsWithFlow(list: List<TmdbFilm>): Flow<List<Film>> {
+        return flow {
+            emit(list.map {
+                Film(
+                    title = it.title,
+                    poster = it.posterPath,
+                    description = it.overview,
+                    rating = it.voteAverage,
+                    filmId = it.id
+                )
             })
+        }
     }
 
-    fun getFilmsFromDB(): LiveData<List<Film>> = repo.getAllFromDB()
+    fun getFilmsFromDB(): Flow<List<Film>> = repo.getAllFromDB()
 
     //Метод ля очистки базы данных
-    fun deleteAllFromDB() = repo.deleteAllFromDB()
+    fun deleteAllFromDB() {
+        scope.launch {
+            repo.deleteAllFromDB()
+        }
+    }
 
     //Метод для сохранения настроек
     fun saveDefaultCategoryToPreferences(category: String) {
@@ -89,11 +104,23 @@ class Interactor(
 
     fun getTimeOfUpdate(): Long = preferences.getTimeOfDatabaseUpdate()
 
-    fun getFavoritesFilmsFromDB(): LiveData<List<Film>> =
+    fun getFavoritesFilmsFromDB(): Flow<List<Film>> =
         favoriteRepository.getAllFavoritesFilmsFromDB()
 
     fun setFilmAsFavoriteInDB(film: Film) = favoriteRepository.setFilmAsFavoriteInDB(film)
 
     //Метод ля удаления фильма из базы данных по Id
     fun setFilmAsNotFavoriteInDB(id: Int) = favoriteRepository.setFilmAsNotFavoriteInDB(id)
+
+    private fun showProgressBar(isShow: Boolean) {
+        scope.launch {
+            progressBarChannel.send(isShow)
+        }
+    }
+
+    private fun showServerError(isShow: Boolean) {
+        scope.launch {
+            serverErrorChannel.send(isShow)
+        }
+    }
 }

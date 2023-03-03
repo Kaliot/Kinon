@@ -41,6 +41,8 @@ class DetailsFragment : Fragment() {
     private lateinit var binding: FragmentDetailsBinding
     private lateinit var film: Film
     private var favoriteFilms = mutableListOf<Film>()
+    private lateinit var scopeIO: CoroutineScope
+
 
     init {
         enterTransition = Fade(Fade.IN).apply { duration = MainActivity.TRANSITION_DURATION }
@@ -78,19 +80,26 @@ class DetailsFragment : Fragment() {
     }
 
     private fun loadFilmsDataBase() {
-        viewModel.filmsListLiveData.observe(viewLifecycleOwner) {
-            favoriteFilms = it.toMutableList()
-            initDetailsFabFavorites()
-            setFabFavoritesIcon()
+        scopeIO = CoroutineScope(Dispatchers.IO)
+        scopeIO.launch {
+            viewModel.filmsListFlow.collect {
+                withContext(Dispatchers.Main) {
+                    favoriteFilms = it as MutableList<Film>
+                    initDetailsFabFavorites()
+                    setFabFavoritesIcon()
+                }
+            }
         }
     }
 
     private fun initDetailsFabFavorites() {
         binding.detailsFabFavorites.setOnClickListener {
-            if (!favoriteFilms.contains(film)) {
-                viewModel.addToFavoritesFilms(film)
-            } else {
-                viewModel.deleteFromFavoritesFilms(film.id)
+            scopeIO.launch {
+                if (!favoriteFilms.contains(film)) {
+                    viewModel.addToFavoritesFilms(film)
+                } else {
+                    viewModel.deleteFromFavoritesFilms(film.id)
+                }
             }
         }
     }
@@ -235,42 +244,45 @@ class DetailsFragment : Fragment() {
             requestPermission()
             return
         }
+        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+            Toast.makeText(
+                requireContext(),
+                TOAST_ERROR_MESSAGE,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
         //Создаем родительский скоуп с диспатчером Main потока, так как будем взаимодействовать с UI
-        MainScope().launch {
-            //Включаем Прогресс-бар
+        val mainScope = CoroutineScope(Dispatchers.Main)
+        mainScope.launch(exceptionHandler) { //Включаем Прогресс-бар
             binding.progressBar.isVisible = true
             //Создаем через async, так как нам нужен результат от работы, то есть Bitmap
-            val scope = CoroutineScope(Dispatchers.IO)
-            val job = scope.async {
+            val job = scopeIO.async {
                 viewModel.loadWallpaper(ApiConstants.IMAGES_URL + "original" + film.poster)
             }
-            //Сохраняем в галерею, как только файл загрузится
-            try {
-                saveToGallery(job.await())
-                //Выводим снекбар с кнопкой перейти в галерею
-                Snackbar.make(
-                    binding.root,
-                    R.string.downloaded_to_gallery,
-                    Snackbar.LENGTH_LONG
-                )
-                    .setAction(R.string.open) {
-                        val intent = Intent()
-                        intent.action = Intent.ACTION_VIEW
-                        intent.type = "image/*"
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        startActivity(intent)
-                    }
-                    .show()
-            } catch (_: Exception) {
-                Toast.makeText(
-                    requireContext(),
-                    "Не удалось скачать изображение!",
-                    Toast.LENGTH_SHORT
-                ).show()
+            supervisorScope {
+                launch(exceptionHandler) {
+                    //Сохраняем в галерею, как только файл загрузится
+                    saveToGallery(job.await())
+                    //Выводим снекбар с кнопкой перейти в галерею
+                    Snackbar.make(
+                        binding.root,
+                        R.string.downloaded_to_gallery,
+                        Snackbar.LENGTH_LONG
+                    )
+                        .setAction(R.string.open) {
+                            val intent = Intent()
+                            intent.action = Intent.ACTION_VIEW
+                            intent.type = "image/*"
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            startActivity(intent)
+                        }
+                        .show()
+                }
             }
             //Отключаем Прогресс-бар
             binding.progressBar.isVisible = false
         }
+        println(mainScope.isActive)
     }
 
     //Узнаем, было ли получено разрешение ранее
@@ -291,6 +303,11 @@ class DetailsFragment : Fragment() {
         )
     }
 
+    override fun onStop() {
+        super.onStop()
+        scopeIO.cancel()
+    }
+
     companion object {
         private const val MIME_TYPE = "text/plain"
         private const val IMAGE_SIZE = "w780"
@@ -299,5 +316,6 @@ class DetailsFragment : Fragment() {
         private const val DOWNLOAD_PATH = "Pictures/Kinon"
         private const val PERCENT_OF_QUALITY = 100
         private const val WRITE_EXTERNAL_STORAGE_PERMISSION_CODE = 1
+        private const val TOAST_ERROR_MESSAGE = "Не удалось скачать изображение!"
     }
 }

@@ -6,15 +6,14 @@ import androidx.lifecycle.ViewModel
 import com.bolunevdev.kinon.App
 import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.domain.Interactor
-import kotlinx.coroutines.flow.Flow
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 import java.net.URL
 import java.util.concurrent.Executors
 import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class DetailsFragmentViewModel : ViewModel() {
-    val filmsListFlow: Flow<List<Film>>
+    val filmsListObservable: Observable<List<Film>>
 
     //Инициализируем интерактор
     @Inject
@@ -22,7 +21,7 @@ class DetailsFragmentViewModel : ViewModel() {
 
     init {
         App.instance.dagger.inject(this)
-        filmsListFlow = interactor.getFavoritesFilmsFromDB()
+        filmsListObservable = interactor.getFavoritesFilmsFromDB()
     }
 
     fun addToFavoritesFilms(film: Film) {
@@ -35,11 +34,10 @@ class DetailsFragmentViewModel : ViewModel() {
         }
     }
 
-    suspend fun loadWallpaper(url: String): Bitmap {
-        return suspendCoroutine {
+    fun loadWallpaper(url: String): Single<Bitmap> {
+        return Single.fromCallable {
             val posterUrl = URL(url)
-            val bitmap = BitmapFactory.decodeStream(posterUrl.openConnection().getInputStream())
-            it.resume(bitmap)
+            BitmapFactory.decodeStream(posterUrl.openConnection().getInputStream())
         }
     }
 }

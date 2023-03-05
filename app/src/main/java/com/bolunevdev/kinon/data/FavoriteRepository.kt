@@ -2,10 +2,10 @@ package com.bolunevdev.kinon.data
 
 import com.bolunevdev.kinon.data.dao.FavoriteFilmDao
 import com.bolunevdev.kinon.data.entity.Film
-import kotlinx.coroutines.flow.Flow
+import io.reactivex.rxjava3.core.Observable
 
 class FavoriteRepository(private val favoriteFilmDao: FavoriteFilmDao) {
-    fun getAllFavoritesFilmsFromDB(): Flow<List<Film>> = favoriteFilmDao.getFavoritesFilms()
+    fun getAllFavoritesFilmsFromDB(): Observable<List<Film>> = favoriteFilmDao.getFavoritesFilms()
 
 
     fun setFilmAsFavoriteInDB(favoriteFilm: Film) {

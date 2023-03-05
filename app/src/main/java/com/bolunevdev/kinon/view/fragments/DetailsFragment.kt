@@ -33,7 +33,10 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.*
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 
 class DetailsFragment : Fragment() {
@@ -41,8 +44,7 @@ class DetailsFragment : Fragment() {
     private lateinit var binding: FragmentDetailsBinding
     private lateinit var film: Film
     private var favoriteFilms = mutableListOf<Film>()
-    private lateinit var scopeIO: CoroutineScope
-
+    private val compositeDisposable = CompositeDisposable()
 
     init {
         enterTransition = Fade(Fade.IN).apply { duration = MainActivity.TRANSITION_DURATION }
@@ -80,27 +82,31 @@ class DetailsFragment : Fragment() {
     }
 
     private fun loadFilmsDataBase() {
-        scopeIO = CoroutineScope(Dispatchers.IO)
-        scopeIO.launch {
-            viewModel.filmsListFlow.collect {
-                withContext(Dispatchers.Main) {
-                    favoriteFilms = it as MutableList<Film>
-                    initDetailsFabFavorites()
-                    setFabFavoritesIcon()
-                }
+        val disposable = viewModel.filmsListObservable
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .onErrorComplete()
+            .subscribe {
+                favoriteFilms = it as MutableList<Film>
+                initDetailsFabFavorites()
+                setFabFavoritesIcon()
             }
-        }
+        compositeDisposable.add(disposable)
     }
 
     private fun initDetailsFabFavorites() {
         binding.detailsFabFavorites.setOnClickListener {
-            scopeIO.launch {
+            Completable.fromAction {
                 if (!favoriteFilms.contains(film)) {
                     viewModel.addToFavoritesFilms(film)
                 } else {
                     viewModel.deleteFromFavoritesFilms(film.id)
                 }
             }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .onErrorComplete()
+                .subscribe()
         }
     }
 
@@ -244,45 +250,45 @@ class DetailsFragment : Fragment() {
             requestPermission()
             return
         }
-        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
-            Toast.makeText(
-                requireContext(),
-                TOAST_ERROR_MESSAGE,
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-        //Создаем родительский скоуп с диспатчером Main потока, так как будем взаимодействовать с UI
-        val mainScope = CoroutineScope(Dispatchers.Main)
-        mainScope.launch(exceptionHandler) { //Включаем Прогресс-бар
-            binding.progressBar.isVisible = true
-            //Создаем через async, так как нам нужен результат от работы, то есть Bitmap
-            val job = scopeIO.async {
-                viewModel.loadWallpaper(ApiConstants.IMAGES_URL + "original" + film.poster)
+
+        val disposable = viewModel.loadWallpaper(ApiConstants.IMAGES_URL + "original" + film.poster)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                // Включаем Прогресс-бар
+                binding.progressBar.isVisible = true
             }
-            supervisorScope {
-                launch(exceptionHandler) {
-                    //Сохраняем в галерею, как только файл загрузится
-                    saveToGallery(job.await())
-                    //Выводим снекбар с кнопкой перейти в галерею
-                    Snackbar.make(
-                        binding.root,
-                        R.string.downloaded_to_gallery,
-                        Snackbar.LENGTH_LONG
-                    )
-                        .setAction(R.string.open) {
-                            val intent = Intent()
-                            intent.action = Intent.ACTION_VIEW
-                            intent.type = "image/*"
-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            startActivity(intent)
+            .doFinally {
+                //Отключаем Прогресс-бар
+                binding.progressBar.isVisible = false
+            }
+            .subscribe({ bitmap ->
+                //Сохраняем в галерею, как только файл загрузится
+                saveToGallery(bitmap)
+                // Выводим снекбар с кнопкой перейти в галерею
+                Snackbar.make(
+                    binding.root,
+                    R.string.downloaded_to_gallery,
+                    Snackbar.LENGTH_LONG
+                )
+                    .setAction(R.string.open) {
+                        val intent = Intent().apply {
+                            action = Intent.ACTION_VIEW
+                            type = "image/*"
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         }
-                        .show()
-                }
-            }
-            //Отключаем Прогресс-бар
-            binding.progressBar.isVisible = false
-        }
-        println(mainScope.isActive)
+                        startActivity(intent)
+                    }
+                    .show()
+            }, {
+                // Обрабатываем ошибку
+                Toast.makeText(
+                    requireContext(),
+                    TOAST_ERROR_MESSAGE,
+                    Toast.LENGTH_SHORT
+                ).show()
+            })
+        compositeDisposable.add(disposable)
     }
 
     //Узнаем, было ли получено разрешение ранее
@@ -305,7 +311,7 @@ class DetailsFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        scopeIO.cancel()
+        compositeDisposable.clear()
     }
 
     companion object {

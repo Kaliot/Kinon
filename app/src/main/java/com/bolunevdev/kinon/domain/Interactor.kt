@@ -3,14 +3,12 @@ package com.bolunevdev.kinon.domain
 import android.content.SharedPreferences
 import com.bolunevdev.kinon.data.*
 import com.bolunevdev.kinon.data.entity.Film
-import com.bolunevdev.kinon.data.entity.TmdbFilm
 import com.bolunevdev.kinon.data.entity.TmdbResults
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.subjects.BehaviorSubject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -21,9 +19,8 @@ class Interactor(
     private val retrofitService: TmdbApi,
     private val preferences: PreferenceProvider
 ) {
-    private val scope = CoroutineScope(Dispatchers.IO)
-    val progressBarChannel = Channel<Boolean>(Channel.CONFLATED)
-    val serverErrorChannel = Channel<Boolean>(Channel.CONFLATED)
+    val progressBarSubject = BehaviorSubject.create<Boolean>()
+    val serverErrorSubject = BehaviorSubject.create<Boolean>()
 
     //В конструктор мы будем передавать страницу, которую нужно загрузить (это для пагинации)
     fun getFilmsFromApi(page: Int) {
@@ -37,19 +34,25 @@ class Interactor(
                     response: Response<TmdbResults>
                 ) {
                     val apiList = response.body()?.results ?: emptyList()
-                    if (apiList.isNotEmpty()) {
-                        scope.launch {
-                            //Кладём фильмы в БД
-                            mapTmdbFilmsToFilmsWithFlow(apiList).collect {
-                                repo.putToDb(it)
-                            }
-                            progressBarChannel.send(false)
+
+                    Single.just(apiList).map { tmdbFilmList ->
+                        val filmList = tmdbFilmList.map {
+                            Film(
+                                title = it.title,
+                                poster = it.posterPath,
+                                description = it.overview,
+                                rating = it.voteAverage,
+                                filmId = it.id
+                            )
                         }
-                        showServerError(false)
-                    } else {
-                        showProgressBar(false)
-                        showServerError(true)
+                        repo.putToDb(filmList)
                     }
+                        .subscribeOn(Schedulers.io())
+                        .onErrorComplete()
+                        .doFinally {
+                            showProgressBar(false)
+                        }
+                        .subscribe()
                 }
 
                 override fun onFailure(call: Call<TmdbResults>, t: Throwable) {
@@ -59,27 +62,16 @@ class Interactor(
             })
     }
 
-    private fun mapTmdbFilmsToFilmsWithFlow(list: List<TmdbFilm>): Flow<List<Film>> {
-        return flow {
-            emit(list.map {
-                Film(
-                    title = it.title,
-                    poster = it.posterPath,
-                    description = it.overview,
-                    rating = it.voteAverage,
-                    filmId = it.id
-                )
-            })
-        }
-    }
-
-    fun getFilmsFromDB(): Flow<List<Film>> = repo.getAllFromDB()
+    fun getFilmsFromDB(): Observable<List<Film>> = repo.getAllFromDB()
 
     //Метод ля очистки базы данных
     fun deleteAllFromDB() {
-        scope.launch {
+        Completable.fromAction {
             repo.deleteAllFromDB()
         }
+            .subscribeOn(Schedulers.io())
+            .onErrorComplete()
+            .subscribe()
     }
 
     //Метод для сохранения настроек
@@ -104,7 +96,7 @@ class Interactor(
 
     fun getTimeOfUpdate(): Long = preferences.getTimeOfDatabaseUpdate()
 
-    fun getFavoritesFilmsFromDB(): Flow<List<Film>> =
+    fun getFavoritesFilmsFromDB(): Observable<List<Film>> =
         favoriteRepository.getAllFavoritesFilmsFromDB()
 
     fun setFilmAsFavoriteInDB(film: Film) = favoriteRepository.setFilmAsFavoriteInDB(film)
@@ -113,14 +105,10 @@ class Interactor(
     fun setFilmAsNotFavoriteInDB(id: Int) = favoriteRepository.setFilmAsNotFavoriteInDB(id)
 
     private fun showProgressBar(isShow: Boolean) {
-        scope.launch {
-            progressBarChannel.send(isShow)
-        }
+        progressBarSubject.onNext(isShow)
     }
 
     private fun showServerError(isShow: Boolean) {
-        scope.launch {
-            serverErrorChannel.send(isShow)
-        }
+        serverErrorSubject.onNext(isShow)
     }
 }

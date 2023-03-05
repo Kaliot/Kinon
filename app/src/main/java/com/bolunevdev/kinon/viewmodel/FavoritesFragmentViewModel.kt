@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import com.bolunevdev.kinon.App
 import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.domain.Interactor
-import kotlinx.coroutines.flow.Flow
+import io.reactivex.rxjava3.core.Observable
 import javax.inject.Inject
 
 class FavoritesFragmentViewModel : ViewModel() {
-    val filmsListFlow: Flow<List<Film>>
+    val filmsListObservable: Observable<List<Film>>
 
     //Инициализируем интерактор
     @Inject
@@ -16,6 +16,6 @@ class FavoritesFragmentViewModel : ViewModel() {
 
     init {
         App.instance.dagger.inject(this)
-        filmsListFlow = interactor.getFavoritesFilmsFromDB()
+        filmsListObservable = interactor.getFavoritesFilmsFromDB()
     }
 }

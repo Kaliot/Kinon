@@ -23,7 +23,9 @@ import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
 import com.bolunevdev.kinon.view.rv_adapters.TopSpacingItemDecoration
 import com.bolunevdev.kinon.viewmodel.HomeFragmentViewModel
-import kotlinx.coroutines.*
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import java.util.*
 
 
@@ -35,7 +37,7 @@ class HomeFragment : Fragment() {
     private lateinit var scrollListener: RecyclerView.OnScrollListener
     private var isShare: Boolean = false
     private var totalItemCount = DEFAULT_TOTAL_ITEM_COUNT
-    private lateinit var scope: CoroutineScope
+    private val compositeDisposable = CompositeDisposable()
     private val sharedChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when (key) {
@@ -96,26 +98,25 @@ class HomeFragment : Fragment() {
     }
 
     private fun setProgressBar() {
-        scope.launch {
-            withContext(Dispatchers.Main) {
-                for (element in viewModel.showProgressBar) {
-                    binding.progressBar.isVisible = element
-                }
+        val disposable = viewModel.showProgressBar
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .onErrorComplete()
+            .subscribe {
+                binding.progressBar.isVisible = it
             }
-        }
+        compositeDisposable.add(disposable)
     }
 
     private fun setServerErrorToast() {
-        scope.launch {
-            withContext(Dispatchers.Main) {
-                for (element in viewModel.showServerError) {
-                    if (element) viewModel.postServerError()
-                }
+        val disposable = viewModel.showServerError
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .onErrorComplete()
+            .subscribe {
+                if (it) Toast.makeText(context, SERVER_ERROR_MESSAGE, Toast.LENGTH_SHORT).show()
             }
-        }
-        viewModel.serverErrorEvent.observe(viewLifecycleOwner) {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-        }
+        compositeDisposable.add(disposable)
     }
 
     private fun addSharedPreferencesListener() {
@@ -136,7 +137,6 @@ class HomeFragment : Fragment() {
                 //какая позиция первого элемента
                 val firstVisibleItems =
                     (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-
                 //проверяем, грузим мы что-то или нет
                 if (!isLoading) {
                     if (visibleItemCount + firstVisibleItems >= totalItemCount - VISIBLE_THRESHOLD) {
@@ -240,16 +240,16 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadFilmsDataBase() {
-        scope = CoroutineScope(Dispatchers.IO)
-        scope.launch {
-            viewModel.filmsListFlow.collect {
-                withContext(Dispatchers.Main) {
-                    filmsDataBase = it as MutableList<Film>
-                    filmsAdapter.updateData(filmsDataBase)
-                    isLoading = false
-                }
+        val disposable = viewModel.filmsListObservable
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .onErrorComplete()
+            .subscribe {
+                filmsDataBase = it as MutableList<Film>
+                filmsAdapter.updateData(filmsDataBase)
+                isLoading = false
             }
-        }
+        compositeDisposable.add(disposable)
     }
 
     private fun changeCategory() {
@@ -271,7 +271,7 @@ class HomeFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         recyclerView.removeOnScrollListener(scrollListener)
-        scope.cancel()
+        compositeDisposable.clear()
     }
 
     override fun onDestroy() {
@@ -279,10 +279,19 @@ class HomeFragment : Fragment() {
         viewModel.unregisterPreferencesListener(sharedChangeListener)
     }
 
+    override fun onResume() {
+        super.onResume()
+        addRVScrollListener()
+        loadFilmsDataBase()
+        setProgressBar()
+        setServerErrorToast()
+    }
+
     companion object {
         private const val VISIBLE_THRESHOLD = 5
         private const val DECORATOR_PADDING_IN_DP = 8
         private var isLoading: Boolean = false
         private const val DEFAULT_TOTAL_ITEM_COUNT = 20
+        const val SERVER_ERROR_MESSAGE = "Не удалось получить данные с сервера!"
     }
 }

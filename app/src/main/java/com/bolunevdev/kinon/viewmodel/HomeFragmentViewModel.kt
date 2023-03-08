@@ -5,17 +5,15 @@ import androidx.lifecycle.ViewModel
 import com.bolunevdev.kinon.App
 import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.domain.Interactor
-import com.bolunevdev.kinon.utils.SingleLiveEvent
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.subjects.BehaviorSubject
 import javax.inject.Inject
 
 
 class HomeFragmentViewModel : ViewModel() {
-    val filmsListFlow: Flow<List<Film>>
-    val showProgressBar: Channel<Boolean>
-    val showServerError: Channel<Boolean>
-    val serverErrorEvent = SingleLiveEvent<String>()
+    val filmsListObservable: Observable<List<Film>>
+    val showProgressBar: BehaviorSubject<Boolean>
+    val showServerError: BehaviorSubject<Boolean>
 
     //Инициализируем интерактор
     @Inject
@@ -25,9 +23,9 @@ class HomeFragmentViewModel : ViewModel() {
 
     init {
         App.instance.dagger.inject(this)
-        filmsListFlow = interactor.getFilmsFromDB()
-        showProgressBar = interactor.progressBarChannel
-        showServerError = interactor.serverErrorChannel
+        filmsListObservable = interactor.getFilmsFromDB()
+        showProgressBar = interactor.progressBarSubject
+        showServerError = interactor.serverErrorSubject
         getFilms()
     }
 
@@ -41,10 +39,6 @@ class HomeFragmentViewModel : ViewModel() {
 
     fun getFilmsFromApi() {
         interactor.getFilmsFromApi(pageNumber)
-    }
-
-    fun postServerError() {
-        serverErrorEvent.postValue(SERVER_ERROR_MESSAGE)
     }
 
     fun addPreferenceListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
@@ -78,6 +72,5 @@ class HomeFragmentViewModel : ViewModel() {
 
     companion object {
         const val DEFAULT_TIME = 600_000L
-        const val SERVER_ERROR_MESSAGE = "Не удалось получить данные с сервера!"
     }
 }

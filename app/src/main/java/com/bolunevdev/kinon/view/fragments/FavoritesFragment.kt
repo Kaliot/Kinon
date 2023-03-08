@@ -18,7 +18,9 @@ import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
 import com.bolunevdev.kinon.view.rv_adapters.TopSpacingItemDecoration
 import com.bolunevdev.kinon.viewmodel.FavoritesFragmentViewModel
-import kotlinx.coroutines.*
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 
 class FavoritesFragment : Fragment() {
@@ -30,7 +32,7 @@ class FavoritesFragment : Fragment() {
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
     private lateinit var recyclerView: RecyclerView
     private var isShare: Boolean = false
-    private lateinit var scope: CoroutineScope
+    private var disposable: Disposable? = null
     private var filmsDataBase = mutableListOf<Film>()
         //Используем backing field
         set(value) {
@@ -127,20 +129,19 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun loadFilmsDataBase() {
-        scope = CoroutineScope(Dispatchers.IO)
-        scope.launch {
-            viewModel.filmsListFlow.collect {
-                withContext(Dispatchers.Main) {
-                    filmsDataBase = it as MutableList<Film>
-                    filmsAdapter.updateData(filmsDataBase)
-                }
+        disposable = viewModel.filmsListObservable
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .onErrorComplete()
+            .subscribe {
+                filmsDataBase = it as MutableList<Film>
+                filmsAdapter.updateData(filmsDataBase)
             }
-        }
     }
 
     override fun onStop() {
         super.onStop()
-        scope.cancel()
+        disposable?.dispose()
     }
 
     companion object {

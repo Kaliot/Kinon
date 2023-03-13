@@ -9,7 +9,6 @@ import com.bolunevdev.kinon.domain.Interactor
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import java.net.URL
-import java.util.concurrent.Executors
 import javax.inject.Inject
 
 class DetailsFragmentViewModel : ViewModel() {
@@ -29,9 +28,7 @@ class DetailsFragmentViewModel : ViewModel() {
     }
 
     fun deleteFromFavoritesFilms(id: Int) {
-        Executors.newSingleThreadExecutor().execute {
-            interactor.setFilmAsNotFavoriteInDB(id)
-        }
+        interactor.setFilmAsNotFavoriteInDB(id)
     }
 
     fun loadWallpaper(url: String): Single<Bitmap> {

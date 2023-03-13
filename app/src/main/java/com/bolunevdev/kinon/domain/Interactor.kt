@@ -35,19 +35,20 @@ class Interactor(
                 ) {
                     val apiList = response.body()?.results ?: emptyList()
 
-                    Single.just(apiList).map { tmdbFilmList ->
-                        val filmList = tmdbFilmList.map {
-                            Film(
-                                title = it.title,
-                                poster = it.posterPath,
-                                description = it.overview,
-                                rating = it.voteAverage,
-                                filmId = it.id
-                            )
-                        }
-                        repo.putToDb(filmList)
-                    }
+                    Single.just(apiList)
                         .subscribeOn(Schedulers.io())
+                        .map { tmdbFilmList ->
+                            val filmList = tmdbFilmList.map {
+                                Film(
+                                    title = it.title,
+                                    poster = it.posterPath,
+                                    description = it.overview,
+                                    rating = it.voteAverage,
+                                    filmId = it.id
+                                )
+                            }
+                            repo.putToDb(filmList)
+                        }
                         .onErrorComplete()
                         .doFinally {
                             showProgressBar(false)
@@ -60,6 +61,21 @@ class Interactor(
                     showServerError(true)
                 }
             })
+    }
+
+    fun getSearchedFilms(request: String, searchPageNumber: Int): Observable<List<Film>> {
+        return retrofitService.getSearchedFilms(API.KEY, "ru-RU", request, searchPageNumber)
+            .map { TmdbResults ->
+                TmdbResults.results.map {
+                    Film(
+                        title = it.title,
+                        poster = it.posterPath,
+                        description = it.overview,
+                        rating = it.voteAverage,
+                        filmId = it.id
+                    )
+                }
+            }
     }
 
     fun getFilmsFromDB(): Observable<List<Film>> = repo.getAllFromDB()
@@ -104,11 +120,11 @@ class Interactor(
     //Метод ля удаления фильма из базы данных по Id
     fun setFilmAsNotFavoriteInDB(id: Int) = favoriteRepository.setFilmAsNotFavoriteInDB(id)
 
-    private fun showProgressBar(isShow: Boolean) {
+    fun showProgressBar(isShow: Boolean) {
         progressBarSubject.onNext(isShow)
     }
 
-    private fun showServerError(isShow: Boolean) {
+    fun showServerError(isShow: Boolean) {
         serverErrorSubject.onNext(isShow)
     }
 }

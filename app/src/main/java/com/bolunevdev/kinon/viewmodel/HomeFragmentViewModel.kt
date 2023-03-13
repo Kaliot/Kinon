@@ -20,6 +20,7 @@ class HomeFragmentViewModel : ViewModel() {
     lateinit var interactor: Interactor
 
     private var pageNumber = 1
+    private var searchPageNumber = 1
 
     init {
         App.instance.dagger.inject(this)
@@ -68,6 +69,17 @@ class HomeFragmentViewModel : ViewModel() {
         val lastTime = getTimeOfDatabaseUpdate()
         val currentTime = System.currentTimeMillis()
         return currentTime - lastTime >= DEFAULT_TIME
+    }
+
+    fun getSearchedFilmsFromApi(searchRequest: String) =
+        interactor.getSearchedFilms(searchRequest, searchPageNumber)
+
+    fun increaseSearchedPageNumber() {
+        searchPageNumber++
+    }
+
+    fun resetSearchedPageNumber() {
+        searchPageNumber = 1
     }
 
     companion object {

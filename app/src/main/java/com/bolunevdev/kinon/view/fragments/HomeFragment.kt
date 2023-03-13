@@ -11,6 +11,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Fade
@@ -19,14 +20,16 @@ import com.bolunevdev.kinon.data.PreferenceProvider
 import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.databinding.FragmentHomeBinding
 import com.bolunevdev.kinon.utils.AnimationHelper
+import com.bolunevdev.kinon.utils.AutoDisposable
+import com.bolunevdev.kinon.utils.addTo
 import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
 import com.bolunevdev.kinon.view.rv_adapters.TopSpacingItemDecoration
 import com.bolunevdev.kinon.viewmodel.HomeFragmentViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 class HomeFragment : Fragment() {
@@ -37,7 +40,11 @@ class HomeFragment : Fragment() {
     private lateinit var scrollListener: RecyclerView.OnScrollListener
     private var isShare: Boolean = false
     private var totalItemCount = DEFAULT_TOTAL_ITEM_COUNT
-    private val compositeDisposable = CompositeDisposable()
+    private val autoDisposable = AutoDisposable()
+    private var isSearchRequestEmpty: Boolean = true
+    private val isSearchRequestEmptyLiveData: MutableLiveData<Boolean> = MutableLiveData(true)
+    private var searchRequest = ""
+    private val searchFilmsList = mutableListOf<Film>()
     private val sharedChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when (key) {
@@ -82,6 +89,8 @@ class HomeFragment : Fragment() {
 
         initPullToRefresh()
 
+        bindAutoDisposable()
+
         loadFilmsDataBase()
 
         initRVTreeObserver()
@@ -95,28 +104,38 @@ class HomeFragment : Fragment() {
         setProgressBar()
 
         setServerErrorToast()
+
+        setIsSearchRequestEmpty()
+    }
+
+    private fun setIsSearchRequestEmpty() {
+        isSearchRequestEmptyLiveData.observe(viewLifecycleOwner) {
+            isSearchRequestEmpty = it
+        }
+    }
+
+    private fun bindAutoDisposable() {
+        autoDisposable.bindTo(lifecycle)
     }
 
     private fun setProgressBar() {
-        val disposable = viewModel.showProgressBar
+        viewModel.showProgressBar
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .onErrorComplete()
             .subscribe {
                 binding.progressBar.isVisible = it
-            }
-        compositeDisposable.add(disposable)
+            }.addTo(autoDisposable)
     }
 
     private fun setServerErrorToast() {
-        val disposable = viewModel.showServerError
+        viewModel.showServerError
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .onErrorComplete()
             .subscribe {
                 if (it) Toast.makeText(context, SERVER_ERROR_MESSAGE, Toast.LENGTH_SHORT).show()
-            }
-        compositeDisposable.add(disposable)
+            }.addTo(autoDisposable)
     }
 
     private fun addSharedPreferencesListener() {
@@ -143,8 +162,13 @@ class HomeFragment : Fragment() {
                         //ставим флаг, что мы попросили еще элементы
                         isLoading = true
                         //Вызывает загрузку данных в RecyclerView
-                        viewModel.increasePageNumber()
-                        viewModel.getFilmsFromApi()
+                        if (isSearchRequestEmpty) {
+                            viewModel.increasePageNumber()
+                            viewModel.getFilmsFromApi()
+                        } else {
+                            viewModel.increaseSearchedPageNumber()
+                            loadSearchFilms()
+                        }
                     }
                 }
             }
@@ -164,32 +188,62 @@ class HomeFragment : Fragment() {
         binding.searchView.setOnClickListener {
             binding.searchView.isIconified = false
         }
+        Observable.create { emitter ->
+            //Подключаем слушателя изменений введенного текста в поиска
+            binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                //Этот метод отрабатывает при нажатии кнопки "поиск" на софт клавиатуре
+                override fun onQueryTextSubmit(query: String?): Boolean = true
 
-        //Подключаем слушателя изменений введенного текста в поиска
-        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            //Этот метод отрабатывает при нажатии кнопки "поиск" на софт клавиатуре
-            override fun onQueryTextSubmit(query: String?) = false
-
-            //Этот метод отрабатывает на каждое изменения текста
-            override fun onQueryTextChange(newText: String): Boolean {
-                //Если ввод пуст то вставляем в адаптер всю БД
-                if (newText.isEmpty()) {
-                    isLoading = false
-                    filmsAdapter.updateData(filmsDataBase)
+                //Этот метод отрабатывает на каждое изменения текста
+                override fun onQueryTextChange(newText: String): Boolean {
+                    emitter.onNext(newText.trim())
                     return true
                 }
-                //Фильтруем список на поискк подходящих сочетаний
-                val result = filmsDataBase.filter {
-                    //Чтобы все работало правильно, нужно и запрос, и имя фильма приводить к нижнему регистру
-                    it.title.lowercase(Locale.getDefault())
-                        .contains(newText.lowercase(Locale.getDefault()))
+            })
+        }
+            .distinctUntilChanged() //Ввод пробела не запустит повторный поиск
+            .subscribeOn(Schedulers.io())
+            .debounce(DEBOUNCE_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+            .filter {
+                if (it.isBlank()) {
+                    loadFilmsDataBase()
+                    isLoading = false
                 }
-                //Добавляем в адаптер
-                isLoading = true
-                filmsAdapter.updateData(result)
-                return true
+                isSearchRequestEmptyLiveData.postValue(it.isBlank())
+                it.isNotBlank()
             }
-        })
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                searchRequest = it
+                searchFilmsList.clear()
+                viewModel.resetSearchedPageNumber()
+                recyclerView.smoothScrollToPosition(0)
+                loadSearchFilms()
+            }, {
+                viewModel.interactor.showServerError(true)
+            }).addTo(autoDisposable)
+    }
+
+    private fun loadSearchFilms() {
+        viewModel.getSearchedFilmsFromApi(searchRequest)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                viewModel.interactor.showProgressBar(true)
+            }
+            .doFinally {
+                viewModel.interactor.showProgressBar(false)
+                viewModel.increaseSearchedPageNumber()
+            }
+            .subscribe({ searchedFilmsList ->
+                searchFilmsList.addAll(searchedFilmsList)
+                //Добавляем в адаптер
+                filmsAdapter.updateData(searchFilmsList.toMutableList())
+                //Проверяем количество полученных фильмов
+                if (searchedFilmsList.size == DEFAULT_TOTAL_ITEM_COUNT) isLoading = false
+            }, {
+                viewModel.interactor.showServerError(true)
+            }).addTo(autoDisposable)
     }
 
     private fun initRV() {
@@ -240,16 +294,16 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadFilmsDataBase() {
-        val disposable = viewModel.filmsListObservable
+        viewModel.filmsListObservable
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .onErrorComplete()
             .subscribe {
                 filmsDataBase = it as MutableList<Film>
-                filmsAdapter.updateData(filmsDataBase)
+                //Загружаем, если нет поискового запроса
+                if (isSearchRequestEmpty) filmsAdapter.updateData(filmsDataBase)
                 isLoading = false
-            }
-        compositeDisposable.add(disposable)
+            }.addTo(autoDisposable)
     }
 
     private fun changeCategory() {
@@ -268,23 +322,14 @@ class HomeFragment : Fragment() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        recyclerView.removeOnScrollListener(scrollListener)
-        compositeDisposable.clear()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         viewModel.unregisterPreferencesListener(sharedChangeListener)
     }
 
-    override fun onResume() {
-        super.onResume()
-        addRVScrollListener()
-        loadFilmsDataBase()
-        setProgressBar()
-        setServerErrorToast()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        recyclerView.removeOnScrollListener(scrollListener)
     }
 
     companion object {
@@ -292,6 +337,7 @@ class HomeFragment : Fragment() {
         private const val DECORATOR_PADDING_IN_DP = 8
         private var isLoading: Boolean = false
         private const val DEFAULT_TOTAL_ITEM_COUNT = 20
-        const val SERVER_ERROR_MESSAGE = "Не удалось получить данные с сервера!"
+        private const val SERVER_ERROR_MESSAGE = "Не удалось получить данные с сервера!"
+        private const val DEBOUNCE_TIMEOUT_MS = 1000L
     }
 }

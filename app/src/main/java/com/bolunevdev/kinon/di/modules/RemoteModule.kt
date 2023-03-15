@@ -5,6 +5,7 @@ import com.bolunevdev.kinon.data.ApiConstants
 import com.bolunevdev.kinon.data.TmdbApi
 import dagger.Module
 import dagger.Provides
+import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -33,6 +34,8 @@ class RemoteModule {
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
         //Указываем базовый URL из констант
         .baseUrl(ApiConstants.BASE_URL)
+        //Добавляем RxJavaRetrofitAdapter
+        .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
         //Добавляем конвертер
         .addConverterFactory(GsonConverterFactory.create())
         //Добавляем кастомный клиент

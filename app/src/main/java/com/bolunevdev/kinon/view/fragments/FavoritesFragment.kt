@@ -14,12 +14,13 @@ import com.bolunevdev.kinon.R
 import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.databinding.FragmentFavoritesBinding
 import com.bolunevdev.kinon.utils.AnimationHelper
+import com.bolunevdev.kinon.utils.AutoDisposable
+import com.bolunevdev.kinon.utils.addTo
 import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
 import com.bolunevdev.kinon.view.rv_adapters.TopSpacingItemDecoration
 import com.bolunevdev.kinon.viewmodel.FavoritesFragmentViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 
@@ -32,7 +33,7 @@ class FavoritesFragment : Fragment() {
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
     private lateinit var recyclerView: RecyclerView
     private var isShare: Boolean = false
-    private var disposable: Disposable? = null
+    private val autoDisposable = AutoDisposable()
     private var filmsDataBase = mutableListOf<Film>()
         //Используем backing field
         set(value) {
@@ -66,9 +67,15 @@ class FavoritesFragment : Fragment() {
 
         initRV()
 
+        bindAutoDisposable()
+
         loadFilmsDataBase()
 
         initRVTreeObserver()
+    }
+
+    private fun bindAutoDisposable() {
+        autoDisposable.bindTo(lifecycle)
     }
 
     private fun startCircularRevealAnimation() {
@@ -129,19 +136,14 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun loadFilmsDataBase() {
-        disposable = viewModel.filmsListObservable
+        viewModel.filmsListObservable
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .onErrorComplete()
             .subscribe {
                 filmsDataBase = it as MutableList<Film>
                 filmsAdapter.updateData(filmsDataBase)
-            }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        disposable?.dispose()
+            }.addTo(autoDisposable)
     }
 
     companion object {

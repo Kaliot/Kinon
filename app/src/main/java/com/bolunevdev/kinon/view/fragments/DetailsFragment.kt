@@ -25,6 +25,8 @@ import com.bolunevdev.kinon.R
 import com.bolunevdev.kinon.data.ApiConstants
 import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.databinding.FragmentDetailsBinding
+import com.bolunevdev.kinon.utils.AutoDisposable
+import com.bolunevdev.kinon.utils.addTo
 import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.viewmodel.DetailsFragmentViewModel
 import com.bumptech.glide.Glide
@@ -35,7 +37,6 @@ import com.bumptech.glide.request.target.Target
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 
@@ -44,13 +45,12 @@ class DetailsFragment : Fragment() {
     private lateinit var binding: FragmentDetailsBinding
     private lateinit var film: Film
     private var favoriteFilms = mutableListOf<Film>()
-    private val compositeDisposable = CompositeDisposable()
+    private val autoDisposable = AutoDisposable()
 
     init {
         enterTransition = Fade(Fade.IN).apply { duration = MainActivity.TRANSITION_DURATION }
         returnTransition = Fade(Fade.OUT).apply { duration = MainActivity.TRANSITION_DURATION }
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,13 +62,14 @@ class DetailsFragment : Fragment() {
         return binding.root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         (requireActivity() as MainActivity)
             .findViewById<FrameLayout>(R.id.background_share_transition)
             .visibility = View.VISIBLE
+
+        bindAutoDisposable()
 
         loadFilmsDataBase()
 
@@ -81,8 +82,12 @@ class DetailsFragment : Fragment() {
         initDetailsFabShare()
     }
 
+    private fun bindAutoDisposable() {
+        autoDisposable.bindTo(lifecycle)
+    }
+
     private fun loadFilmsDataBase() {
-        val disposable = viewModel.filmsListObservable
+        viewModel.filmsListObservable
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .onErrorComplete()
@@ -90,8 +95,7 @@ class DetailsFragment : Fragment() {
                 favoriteFilms = it as MutableList<Film>
                 initDetailsFabFavorites()
                 setFabFavoritesIcon()
-            }
-        compositeDisposable.add(disposable)
+            }.addTo(autoDisposable)
     }
 
     private fun initDetailsFabFavorites() {
@@ -153,7 +157,7 @@ class DetailsFragment : Fragment() {
         }
 
         //Устанавливаем заголовок
-        binding.detailsPoster.transitionName = film.id.toString()
+        binding.detailsPoster.transitionName = film.filmId.toString()
         binding.detailsToolbar.title = film.title
 
         //Устанавливаем картинку
@@ -251,7 +255,7 @@ class DetailsFragment : Fragment() {
             return
         }
 
-        val disposable = viewModel.loadWallpaper(ApiConstants.IMAGES_URL + "original" + film.poster)
+        viewModel.loadWallpaper(ApiConstants.IMAGES_URL + "original" + film.poster)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
@@ -287,8 +291,7 @@ class DetailsFragment : Fragment() {
                     TOAST_ERROR_MESSAGE,
                     Toast.LENGTH_SHORT
                 ).show()
-            })
-        compositeDisposable.add(disposable)
+            }).addTo(autoDisposable)
     }
 
     //Узнаем, было ли получено разрешение ранее
@@ -307,11 +310,6 @@ class DetailsFragment : Fragment() {
             arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
             WRITE_EXTERNAL_STORAGE_PERMISSION_CODE
         )
-    }
-
-    override fun onStop() {
-        super.onStop()
-        compositeDisposable.clear()
     }
 
     companion object {

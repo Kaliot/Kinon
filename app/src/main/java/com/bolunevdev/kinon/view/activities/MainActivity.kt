@@ -12,8 +12,8 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.bolunevdev.core_api.entity.Film
 import com.bolunevdev.kinon.R
-import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.databinding.ActivityMainBinding
 import com.bolunevdev.kinon.view.fragments.DetailsFragment
 
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         //Кладем наш фильм в "посылку"
         bundle.putParcelable(KEY_FILM_DETAILS_FRAGMENT, film)
 
-        //Кладем фрагмент с деталями в перменную
+        //Кладем фрагмент с деталями в переменную
         val fragment = DetailsFragment()
 
         //Прикрепляем нашу "посылку" к фрагменту

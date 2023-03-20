@@ -1,17 +1,16 @@
 package com.bolunevdev.kinon.domain
 
 import android.content.SharedPreferences
-import com.bolunevdev.kinon.data.*
-import com.bolunevdev.kinon.data.entity.Film
-import com.bolunevdev.kinon.data.entity.TmdbResults
+import com.bolunevdev.core_api.entity.Film
+import com.bolunevdev.kinon.data.FavoriteRepository
+import com.bolunevdev.kinon.data.MainRepository
+import com.bolunevdev.kinon.data.PreferenceProvider
+import com.bolunevdev.remote_module.API
+import com.bolunevdev.remote_module.TmdbApi
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class Interactor(
     private val repo: MainRepository,
@@ -27,44 +26,43 @@ class Interactor(
         showProgressBar(true)
         showServerError(false)
         //Метод getDefaultCategoryFromPreferences() будет нам получать при каждом запросе нужный нам список фильмов
-        retrofitService.getFilms(getDefaultCategoryFromPreferences(), API.KEY, "ru-RU", page)
-            .enqueue(object : Callback<TmdbResults> {
-                override fun onResponse(
-                    call: Call<TmdbResults>,
-                    response: Response<TmdbResults>
-                ) {
-                    val apiList = response.body()?.results ?: emptyList()
-
-                    Single.just(apiList)
-                        .subscribeOn(Schedulers.io())
-                        .map { tmdbFilmList ->
-                            val filmList = tmdbFilmList.map {
-                                Film(
-                                    title = it.title,
-                                    poster = it.posterPath,
-                                    description = it.overview,
-                                    rating = it.voteAverage,
-                                    filmId = it.id
-                                )
-                            }
-                            repo.putToDb(filmList)
-                        }
-                        .onErrorComplete()
-                        .doFinally {
-                            showProgressBar(false)
-                        }
-                        .subscribe()
+        retrofitService.getFilms(
+            getDefaultCategoryFromPreferences(),
+            API.KEY,
+            "ru-RU",
+            page
+        )
+            .subscribeOn(Schedulers.io())
+            .map { tmdbFilmList ->
+                val filmList = tmdbFilmList.results.map {
+                    Film(
+                        title = it.title,
+                        poster = it.posterPath,
+                        description = it.overview,
+                        rating = it.voteAverage,
+                        filmId = it.id
+                    )
                 }
-
-                override fun onFailure(call: Call<TmdbResults>, t: Throwable) {
-                    showProgressBar(false)
-                    showServerError(true)
-                }
-            })
+                repo.putToDb(filmList)
+            }
+            .doOnError {
+                showProgressBar(false)
+                showServerError(true)
+            }
+            .onErrorComplete()
+            .doFinally {
+                showProgressBar(false)
+            }
+            .subscribe()
     }
 
     fun getSearchedFilms(request: String, searchPageNumber: Int): Observable<List<Film>> {
-        return retrofitService.getSearchedFilms(API.KEY, "ru-RU", request, searchPageNumber)
+        return retrofitService.getSearchedFilms(
+            API.KEY,
+            "ru-RU",
+            request,
+            searchPageNumber
+        )
             .map { TmdbResults ->
                 TmdbResults.results.map {
                     Film(

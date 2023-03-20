@@ -1,7 +1,7 @@
 package com.bolunevdev.kinon.utils
 
 import androidx.recyclerview.widget.DiffUtil
-import com.bolunevdev.kinon.data.entity.Film
+import com.bolunevdev.core_api.entity.Film
 
 class FilmDiff(private val oldList: List<Film>, private val newList: List<Film>) :
     DiffUtil.Callback() {

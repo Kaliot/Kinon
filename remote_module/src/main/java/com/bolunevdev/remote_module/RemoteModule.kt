@@ -1,8 +1,6 @@
-package com.bolunevdev.kinon.di.modules
+package com.bolunevdev.remote_module
 
 import androidx.viewbinding.BuildConfig
-import com.bolunevdev.kinon.data.ApiConstants
-import com.bolunevdev.kinon.data.TmdbApi
 import dagger.Module
 import dagger.Provides
 import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory

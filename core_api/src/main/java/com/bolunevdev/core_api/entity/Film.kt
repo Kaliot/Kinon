@@ -1,4 +1,4 @@
-package com.bolunevdev.kinon.data.entity
+package com.bolunevdev.core_api.entity
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo
@@ -7,8 +7,9 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
-@Parcelize
+
 @Entity(tableName = "cached_films", indices = [Index(value = ["title"], unique = false)])
+@Parcelize
 data class Film(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "title") val title: String,

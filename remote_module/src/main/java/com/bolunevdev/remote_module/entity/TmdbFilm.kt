@@ -1,4 +1,4 @@
-package com.bolunevdev.kinon.data.entity
+package com.bolunevdev.remote_module.entity
 
 import com.google.gson.annotations.SerializedName
 

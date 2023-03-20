@@ -2,8 +2,8 @@ package com.bolunevdev.kinon.viewmodel
 
 import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
+import com.bolunevdev.core_api.entity.Film
 import com.bolunevdev.kinon.App
-import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.domain.Interactor
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject

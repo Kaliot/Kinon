@@ -1,7 +1,7 @@
 package com.bolunevdev.kinon.data
 
-import com.bolunevdev.kinon.data.dao.FilmDao
-import com.bolunevdev.kinon.data.entity.Film
+import com.bolunevdev.core_api.db.FilmDao
+import com.bolunevdev.core_api.entity.Film
 import io.reactivex.rxjava3.core.Observable
 
 class MainRepository(private val filmDao: FilmDao) {

@@ -9,12 +9,12 @@ import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Fade
 import androidx.transition.TransitionSet
-import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
+import com.bolunevdev.core_api.entity.Film
 import com.bolunevdev.kinon.R
-import com.bolunevdev.kinon.data.ApiConstants
-import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.view.customviews.RatingDonutView
+import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
+import com.bolunevdev.remote_module.ApiConstants
 import com.bumptech.glide.Glide
 
 class FilmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

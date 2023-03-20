@@ -13,3 +13,4 @@
 .externalNativeBuild
 .cxx
 local.properties
+/remote_module/src/main/java/com/bolunevdev/remote_module/API.kt

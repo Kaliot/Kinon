@@ -6,8 +6,8 @@ import android.widget.ImageView
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bolunevdev.core_api.entity.Film
 import com.bolunevdev.kinon.R
-import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.utils.FilmDiff
 import com.bolunevdev.kinon.view.rv_viewholders.FilmViewHolder
 

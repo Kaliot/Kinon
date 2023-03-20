@@ -1,0 +1,12 @@
+ext {
+    daggerVersion = '2.44.2'
+    roomVersion = '2.5.0'
+
+    dagger = "com.google.dagger:dagger:$daggerVersion"
+    daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
+    room = "androidx.room:room-runtime:$roomVersion"
+    roomRx = "androidx.room:room-rxjava3:$roomVersion"
+    roomCompiler = "androidx.room:room-compiler:$roomVersion"
+    coreKTX = "androidx.core:core-ktx:1.9.0"
+    appcompat = "androidx.appcompat:appcompat:1.6.1"
+}

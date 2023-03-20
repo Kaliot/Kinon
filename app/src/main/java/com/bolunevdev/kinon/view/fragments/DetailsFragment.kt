@@ -21,14 +21,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.transition.Fade
 import androidx.transition.TransitionInflater
+import com.bolunevdev.core_api.entity.Film
 import com.bolunevdev.kinon.R
-import com.bolunevdev.kinon.data.ApiConstants
-import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.databinding.FragmentDetailsBinding
 import com.bolunevdev.kinon.utils.AutoDisposable
 import com.bolunevdev.kinon.utils.addTo
 import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.viewmodel.DetailsFragmentViewModel
+import com.bolunevdev.remote_module.ApiConstants
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException

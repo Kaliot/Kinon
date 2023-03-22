@@ -1,28 +1,29 @@
 package com.bolunevdev.kinon
 
 import android.app.Application
-import com.bolunevdev.kinon.di.AppComponent
-import com.bolunevdev.kinon.di.DaggerAppComponent
-import com.bolunevdev.kinon.di.modules.DatabaseModule
-import com.bolunevdev.kinon.di.modules.DomainModule
-import com.bolunevdev.kinon.di.modules.RemoteModule
+import com.bolunevdev.kinon.di.FacadeComponent
+
 
 class App : Application() {
-    lateinit var dagger: AppComponent
+    lateinit var dagger: FacadeComponent
 
     override fun onCreate() {
         super.onCreate()
         instance = this
+        dagger = getFacade()
+    }
+
+    private fun getFacade(): FacadeComponent {
         //Создаем компонент
-        dagger = DaggerAppComponent.builder()
-            .remoteModule(RemoteModule())
-            .databaseModule(DatabaseModule())
-            .domainModule(DomainModule(this))
-            .build()
+        return facadeComponent ?: FacadeComponent.init(this).also {
+            facadeComponent = it
+        }
     }
 
     companion object {
+        //Ссылка для доступа к itemsDao из активити
         lateinit var instance: App
             private set
+        private var facadeComponent: FacadeComponent? = null
     }
 }

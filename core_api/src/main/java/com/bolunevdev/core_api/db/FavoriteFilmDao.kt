@@ -1,7 +1,7 @@
-package com.bolunevdev.kinon.data.dao
+package com.bolunevdev.core_api.db
 
 import androidx.room.*
-import com.bolunevdev.kinon.data.entity.Film
+import com.bolunevdev.core_api.entity.Film
 import io.reactivex.rxjava3.core.Observable
 
 @Dao

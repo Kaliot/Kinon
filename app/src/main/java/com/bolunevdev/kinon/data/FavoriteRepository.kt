@@ -1,12 +1,11 @@
 package com.bolunevdev.kinon.data
 
-import com.bolunevdev.kinon.data.dao.FavoriteFilmDao
-import com.bolunevdev.kinon.data.entity.Film
+import com.bolunevdev.core_api.db.FavoriteFilmDao
+import com.bolunevdev.core_api.entity.Film
 import io.reactivex.rxjava3.core.Observable
 
 class FavoriteRepository(private val favoriteFilmDao: FavoriteFilmDao) {
     fun getAllFavoritesFilmsFromDB(): Observable<List<Film>> = favoriteFilmDao.getFavoritesFilms()
-
 
     fun setFilmAsFavoriteInDB(favoriteFilm: Film) {
         favoriteFilmDao.insertFavoriteFilm(favoriteFilm)

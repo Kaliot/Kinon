@@ -1,4 +1,4 @@
-package com.bolunevdev.kinon.data
+package com.bolunevdev.remote_module
 
 object ApiConstants {
     const val BASE_URL = "https://api.themoviedb.org/3/"

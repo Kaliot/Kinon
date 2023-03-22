@@ -15,9 +15,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Fade
+import com.bolunevdev.core_api.entity.Film
 import com.bolunevdev.kinon.R
 import com.bolunevdev.kinon.data.PreferenceProvider
-import com.bolunevdev.kinon.data.entity.Film
 import com.bolunevdev.kinon.databinding.FragmentHomeBinding
 import com.bolunevdev.kinon.utils.AnimationHelper
 import com.bolunevdev.kinon.utils.AutoDisposable

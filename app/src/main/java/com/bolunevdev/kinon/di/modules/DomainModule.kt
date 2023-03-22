@@ -1,11 +1,13 @@
 package com.bolunevdev.kinon.di.modules
 
 import android.content.Context
+import com.bolunevdev.core_api.db.FavoriteFilmDao
+import com.bolunevdev.core_api.db.FilmDao
 import com.bolunevdev.kinon.data.FavoriteRepository
 import com.bolunevdev.kinon.data.MainRepository
 import com.bolunevdev.kinon.data.PreferenceProvider
-import com.bolunevdev.kinon.data.TmdbApi
 import com.bolunevdev.kinon.domain.Interactor
+import com.bolunevdev.remote_module.TmdbApi
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -13,14 +15,19 @@ import javax.inject.Singleton
 @Module
 //Передаем контекст для SharedPreferences через конструктор
 class DomainModule(val context: Context) {
-    //Нам нужно контекст как-то провайдить, поэтому создаем такой метод
-    @Provides
-    fun provideContext() = context
-
     @Singleton
     @Provides
     //Создаем экземпляр SharedPreferences
     fun providePreferences(context: Context) = PreferenceProvider(context)
+
+    @Singleton
+    @Provides
+    fun provideMainRepository(filmDao: FilmDao) = MainRepository(filmDao)
+
+    @Singleton
+    @Provides
+    fun provideFavoriteRepository(favoriteFilmDao: FavoriteFilmDao) =
+        FavoriteRepository(favoriteFilmDao)
 
     @Singleton
     @Provides

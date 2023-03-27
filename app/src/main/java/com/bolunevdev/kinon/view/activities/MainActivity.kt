@@ -1,8 +1,6 @@
 package com.bolunevdev.kinon.view.activities
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
+import android.content.*
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.Toast
@@ -15,6 +13,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.bolunevdev.core_api.entity.Film
 import com.bolunevdev.kinon.R
 import com.bolunevdev.kinon.databinding.ActivityMainBinding
+import com.bolunevdev.kinon.receivers.BatteryBroadcastReceiver
 import com.bolunevdev.kinon.view.fragments.DetailsFragment
 
 
@@ -23,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var clipboardManager: ClipboardManager
+    private val batteryBroadcastReceiver = BatteryBroadcastReceiver()
 
     private val onBackPressedCallback: OnBackPressedCallback =
         object : OnBackPressedCallback(true) {
@@ -61,6 +61,15 @@ class MainActivity : AppCompatActivity() {
                 }
         }
 
+        initBroadcastReceiver()
+    }
+
+    private fun initBroadcastReceiver() {
+        val batteryFilter = IntentFilter().apply {
+            addAction(Intent.ACTION_BATTERY_LOW)
+            addAction(Intent.ACTION_POWER_CONNECTED)
+        }
+        registerReceiver(batteryBroadcastReceiver, batteryFilter)
     }
 
     fun launchDetailsFragment(film: Film, direction: Int, poster: ImageView) {
@@ -90,6 +99,11 @@ class MainActivity : AppCompatActivity() {
         val clipData = ClipData.newPlainText(FILM_TITLE, film.title)
         clipboardManager.setPrimaryClip(clipData)
         Toast.makeText(this, getString(R.string.film_title_copied), Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(batteryBroadcastReceiver)
     }
 
     companion object {

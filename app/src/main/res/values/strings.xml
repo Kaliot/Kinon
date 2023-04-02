@@ -4,26 +4,6 @@
     <string name="btn_favorites">Избранное</string>
     <string name="btn_recommended">Рекомендованное</string>
     <string name="btn_settings">Настройки</string>
-    <string name="memento_title">Memento</string>
-    <string name="memento_description">A man with short-term memory loss attempts to track down his wife\'s murderer.</string>
-    <string name="inception_title">Inception</string>
-    <string name="inception_description">A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O., but his tragic past may doom the project and his team to disaster.</string>
-    <string name="the_dark_knight_title">The Dark Knight</string>
-    <string name="the_dark_knight_description">When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.</string>
-    <string name="forrest_gump_title">Forrest Gump</string>
-    <string name="forrest_gump_description">The presidencies of Kennedy and Johnson, the Vietnam War, the Watergate scandal and other historical events unfold from the perspective of an Alabama man with an IQ of 75, whose only desire is to be reunited with his childhood sweetheart.</string>
-    <string name="pulp_fiction_title">Pulp Fiction</string>
-    <string name="pulp_fiction_description">The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.</string>
-    <string name="the_matrix_title">The Matrix</string>
-    <string name="the_matrix_description">When a beautiful stranger leads computer hacker Neo to a forbidding underworld, he discovers the shocking truth-the life he knows is the elaborate deception of an evil cyber-intelligence.</string>
-    <string name="interstellar_title">Interstellar</string>
-    <string name="interstellar_description">A team of explorers travel through a wormhole in space in an attempt to ensure humanity\'s survival.</string>
-    <string name="the_wolf_of_wall_street_title">The Wolf of Wall Street</string>
-    <string name="the_wolf_of_wall_street_description">Based on the true story of Jordan Belfort, from his rise to a wealthy stock-broker living the high life to his fall involving crime, corruption and the federal government.</string>
-    <string name="american_beauty_title">American Beauty</string>
-    <string name="american_beauty_description">A sexually frustrated suburban father has a mid-life crisis after becoming infatuated with his daughter\'s best friend.</string>
-    <string name="fight_club_title">Fight Club</string>
-    <string name="fight_club_description">An insomniac office worker and a devil-may-care soap maker form an underground fight club that evolves into much more.</string>
     <string name="btn_menu">Меню</string>
     <string name="share_btn_desc">Share</string>
     <string name="poster_description">Poster</string>
@@ -47,4 +27,7 @@
     <string name="downloaded_to_gallery">"Сохранено в галерею"</string>
     <string name="open">В галерею</string>
     <string name="download_poster_btn_desc">Download poster</string>
+    <string name="watch_later_btn_desc">Watch later</string>
+    <string name="notification_action_watch">Посмотреть</string>
+    <string name="notification_title">Вы хотели посмотреть этот фильм!</string>
 </resources>

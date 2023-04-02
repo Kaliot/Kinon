@@ -82,6 +82,20 @@
         app:srcCompat="@drawable/ic_baseline_cloud_download_24"
         app:tint="@color/white" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/details_fab_watch_later"
+        style="@style/MyTheme.FloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:contentDescription="@string/watch_later_btn_desc"
+        android:translationX="@dimen/fab_watch_later_translationX"
+        app:borderWidth="0dp"
+        app:layout_anchor="@id/app_bar"
+        app:layout_anchorGravity="left|bottom"
+        app:srcCompat="@drawable/ic_watch_later_24"
+        app:tint="@color/white" />
+
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="@dimen/details_progress_bar_width"

@@ -24,6 +24,7 @@ import androidx.transition.TransitionInflater
 import com.bolunevdev.core_api.entity.Film
 import com.bolunevdev.kinon.R
 import com.bolunevdev.kinon.databinding.FragmentDetailsBinding
+import com.bolunevdev.kinon.notifications.WatchLaterNotificationHelper
 import com.bolunevdev.kinon.utils.AutoDisposable
 import com.bolunevdev.kinon.utils.addTo
 import com.bolunevdev.kinon.view.activities.MainActivity
@@ -37,6 +38,7 @@ import com.bumptech.glide.request.target.Target
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 
@@ -46,6 +48,7 @@ class DetailsFragment : Fragment() {
     private lateinit var film: Film
     private var favoriteFilms = mutableListOf<Film>()
     private val autoDisposable = AutoDisposable()
+    private lateinit var notificationHelper: WatchLaterNotificationHelper
 
     init {
         enterTransition = Fade(Fade.IN).apply { duration = MainActivity.TRANSITION_DURATION }
@@ -80,6 +83,8 @@ class DetailsFragment : Fragment() {
         initDetailsFabDownloadWp()
 
         initDetailsFabShare()
+
+        initDetailsFabWatchLater()
     }
 
     private fun bindAutoDisposable() {
@@ -310,6 +315,17 @@ class DetailsFragment : Fragment() {
             arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
             WRITE_EXTERNAL_STORAGE_PERMISSION_CODE
         )
+    }
+
+    private fun initDetailsFabWatchLater() {
+        binding.detailsFabWatchLater.setOnClickListener {
+            notificationHelper = WatchLaterNotificationHelper(requireContext())
+            Observable.just(film)
+                .subscribeOn(Schedulers.newThread())
+                .subscribe { film ->
+                    notificationHelper.sendWatchLaterNotification(film)
+                }.addTo(autoDisposable)
+        }
     }
 
     companion object {

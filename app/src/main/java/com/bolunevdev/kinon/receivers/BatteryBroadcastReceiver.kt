@@ -7,8 +7,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 
 class BatteryBroadcastReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context?, intent: Intent?) {
-        when (intent?.action) {
+    override fun onReceive(context: Context, intent: Intent) {
+        when (intent.action) {
             Intent.ACTION_BATTERY_LOW -> {
                 switchToNightTheme()
                 Toast.makeText(context, BATTERY_LOW_TOAST, Toast.LENGTH_SHORT).show()
@@ -20,7 +20,7 @@ class BatteryBroadcastReceiver : BroadcastReceiver() {
         }
     }
 
-    fun switchToNightTheme() {
+    private fun switchToNightTheme() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
     }
 

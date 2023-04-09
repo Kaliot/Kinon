@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation"
-    app:startDestination="@id/home_root">
+    app:startDestination="@id/homeRoot">
 
     <navigation
-        android:id="@+id/home_root"
+        android:id="@+id/homeRoot"
         app:startDestination="@id/home">
         <fragment
             android:id="@+id/home"
@@ -14,10 +14,10 @@
             android:label="fragment_home"
             tools:layout="@layout/fragment_home">
             <action
-                android:id="@+id/action_homeFragment_to_detailsFragment"
+                android:id="@+id/actionHomeFragmentToDetailsFragment"
                 app:destination="@id/detailsFragmentHome" />
             <action
-                android:id="@+id/action_homeFragment_to_exitMenuFragment"
+                android:id="@+id/actionHomeFragmentToExitMenuFragment"
                 app:destination="@id/exitMenuFragment"
                 app:enterAnim="@android:anim/fade_in"
                 app:exitAnim="@android:anim/fade_out"
@@ -39,15 +39,15 @@
     </navigation>
 
     <navigation
-        android:id="@+id/favorites_root"
+        android:id="@+id/favoritesRoot"
         app:startDestination="@id/favorites">
         <fragment
             android:id="@+id/favorites"
             android:name="com.bolunevdev.kinon.view.fragments.FavoritesFragment"
-            android:label="Favorites"
+            android:label="fragment_favorites"
             tools:layout="@layout/fragment_favorites">
             <action
-                android:id="@+id/action_favorites_to_detailsFragment"
+                android:id="@+id/actionFavoritesToDetailsFragment"
                 app:destination="@id/detailsFragmentFavorites" />
         </fragment>
         <fragment
@@ -58,17 +58,17 @@
     </navigation>
 
     <navigation
-        android:id="@+id/new_titles_root"
-        app:startDestination="@id/new_titles">
+        android:id="@+id/watchLaterRoot"
+        app:startDestination="@id/newTitles">
         <fragment
-            android:id="@+id/new_titles"
-            android:name="com.bolunevdev.kinon.view.fragments.NewTitlesFragment"
+            android:id="@+id/newTitles"
+            android:name="com.bolunevdev.kinon.view.fragments.WatchLaterFragment"
             android:label="New_titles"
-            tools:layout="@layout/fragment_new_titles" />
+            tools:layout="@layout/fragment_watch_later" />
     </navigation>
 
     <navigation
-        android:id="@+id/recommended_root"
+        android:id="@+id/recommendedRoot"
         app:startDestination="@id/recommended">
         <fragment
             android:id="@+id/recommended"
@@ -78,7 +78,7 @@
     </navigation>
 
     <navigation
-        android:id="@+id/settings_root"
+        android:id="@+id/settingsRoot"
         app:startDestination="@id/settings">
         <fragment
             android:id="@+id/settings"

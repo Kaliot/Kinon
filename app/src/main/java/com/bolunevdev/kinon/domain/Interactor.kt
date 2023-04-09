@@ -1,10 +1,14 @@
 package com.bolunevdev.kinon.domain
 
+import android.content.Context
 import android.content.SharedPreferences
+import com.bolunevdev.core_api.entity.Alarm
 import com.bolunevdev.core_api.entity.Film
+import com.bolunevdev.kinon.data.AlarmRepository
 import com.bolunevdev.kinon.data.FavoriteRepository
 import com.bolunevdev.kinon.data.MainRepository
 import com.bolunevdev.kinon.data.PreferenceProvider
+import com.bolunevdev.kinon.notifications.WatchLaterNotificationHelper
 import com.bolunevdev.remote_module.API
 import com.bolunevdev.remote_module.TmdbApi
 import io.reactivex.rxjava3.core.Completable
@@ -15,9 +19,12 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 class Interactor(
     private val repo: MainRepository,
     private val favoriteRepository: FavoriteRepository,
+    private val alarmRepository: AlarmRepository,
     private val retrofitService: TmdbApi,
-    private val preferences: PreferenceProvider
+    private val preferences: PreferenceProvider,
+    private val notificationHelper: WatchLaterNotificationHelper
 ) {
+
     val progressBarSubject = BehaviorSubject.create<Boolean>()
     val serverErrorSubject = BehaviorSubject.create<Boolean>()
 
@@ -124,5 +131,68 @@ class Interactor(
 
     fun showServerError(isShow: Boolean) {
         serverErrorSubject.onNext(isShow)
+    }
+
+    fun addAlarm(context: Context, film: Film) {
+        notificationHelper.setWatchLaterAlarm(context, film) { alarmTime ->
+            putAlarmToDB(film, alarmTime)
+        }
+    }
+
+    private fun convertAlarmToFilm(alarm: Alarm): Film = Film(
+        title = alarm.title,
+        poster = alarm.poster,
+        description = alarm.description,
+        rating = alarm.rating,
+        filmId = alarm.filmId
+    )
+
+    fun editAlarm(context: Context, alarm: Alarm) {
+        val film = convertAlarmToFilm(alarm)
+        addAlarm(context, film)
+    }
+
+    fun cancelAlarm(context: Context, alarm: Alarm) {
+        deleteAlarmFromDB(alarm)
+        val film = convertAlarmToFilm(alarm)
+        notificationHelper.cancelWatchLaterAlarm(context, film)
+    }
+
+    private fun putAlarmToDB(film: Film, timeInMillis: Long) {
+        val alarm = Alarm(
+            timeInMillis = timeInMillis,
+            title = film.title,
+            poster = film.poster,
+            description = film.description,
+            rating = film.rating,
+            filmId = film.filmId
+        )
+        Completable.fromAction {
+            alarmRepository.putToDb(alarm)
+        }
+            .subscribeOn(Schedulers.io())
+            .onErrorComplete()
+            .subscribe()
+    }
+
+    private fun deleteAlarmFromDB(alarm: Alarm) {
+        Completable.fromAction {
+            alarmRepository.deleteFromDB(alarm)
+        }
+            .subscribeOn(Schedulers.io())
+            .onErrorComplete()
+            .subscribe()
+    }
+
+    fun getAlarmsFromDB(): Observable<List<Alarm>> = alarmRepository.getAllFromDB()
+
+    fun deleteOldAlarmsFromDB() {
+        val currentTimeInMillis = System.currentTimeMillis()
+        getAlarmsFromDB()
+            .subscribeOn(Schedulers.io())
+            .flatMapIterable { it }
+            .filter { alarm -> alarm.timeInMillis < currentTimeInMillis }
+            .doOnNext { alarm -> deleteAlarmFromDB(alarm) }
+            .subscribe()
     }
 }

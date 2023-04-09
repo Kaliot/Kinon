@@ -16,24 +16,25 @@ import com.bolunevdev.kinon.databinding.ActivityMainBinding
 import com.bolunevdev.kinon.receivers.BatteryBroadcastReceiver
 import com.bolunevdev.kinon.view.fragments.DetailsFragment
 
-
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var navController: NavController
-    private lateinit var navHostFragment: NavHostFragment
-    private lateinit var clipboardManager: ClipboardManager
+
+    private var binding: ActivityMainBinding? = null
+    private var navController: NavController? = null
+    private var navHostFragment: NavHostFragment? = null
+    private var clipboardManager: ClipboardManager? = null
     private val batteryBroadcastReceiver = BatteryBroadcastReceiver()
 
-    private val onBackPressedCallback: OnBackPressedCallback =
+    private val onBackPressedCallback: OnBackPressedCallback by lazy {
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (navController.currentDestination == navController.findDestination(R.id.home))
-                    navController.navigate(R.id.action_homeFragment_to_exitMenuFragment)
+                if (navController?.currentDestination == navController?.findDestination(R.id.home))
+                    navController?.navigate(R.id.actionHomeFragmentToExitMenuFragment)
                 else {
-                    navController.popBackStack()
+                    navController?.popBackStack()
                 }
             }
         }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,26 +44,26 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater).also { setContentView(it.root) }
 
         navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment_placeholder) as NavHostFragment
-        navController = navHostFragment.navController
+            supportFragmentManager.findFragmentById(R.id.fragmentPlaceholder) as NavHostFragment
+        navController = navHostFragment?.navController
 
-        binding.bottomNavigation.setupWithNavController(navController)
+        binding?.bottomNavigation?.setupWithNavController(navController!!)
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
-        binding.bottomNavigation.setOnItemReselectedListener {
-            if (navController.currentDestination?.parent?.startDestinationId !=
-                navController.currentDestination?.id
+        binding?.bottomNavigation?.setOnItemReselectedListener {
+            if (navController?.currentDestination?.parent?.startDestinationId !=
+                navController?.currentDestination?.id
             )
-                navController.currentDestination?.parent?.startDestinationId?.let { it1 ->
-                    navController.popBackStack(
+                navController?.currentDestination?.parent?.startDestinationId?.let { it1 ->
+                    navController?.popBackStack(
                         it1, false
                     )
                 }
         }
-
         initBroadcastReceiver()
     }
+
 
     private fun initBroadcastReceiver() {
         val batteryFilter = IntentFilter().apply {
@@ -92,12 +93,12 @@ class MainActivity : AppCompatActivity() {
         fragment.arguments = bundle
 
         //Запускаем фрагмент
-        navController.navigate(direction, fragment.arguments, null, extras)
+        navController?.navigate(direction, fragment.arguments, null, extras)
     }
 
     fun copyFilmTitle(film: Film) {
         val clipData = ClipData.newPlainText(FILM_TITLE, film.title)
-        clipboardManager.setPrimaryClip(clipData)
+        clipboardManager?.setPrimaryClip(clipData)
         Toast.makeText(this, getString(R.string.film_title_copied), Toast.LENGTH_SHORT).show()
     }
 
@@ -107,7 +108,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val KEY_FILM_DETAILS_FRAGMENT = "film"
+        const val KEY_FILM_DETAILS_FRAGMENT = "FILM_KEY"
         const val FILM_TITLE = "FILM_TITLE"
         const val TRANSITION_DURATION = 400L
         const val TRANSITION_DURATION_FAST = 150L

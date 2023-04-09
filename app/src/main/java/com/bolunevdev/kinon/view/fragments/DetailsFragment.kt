@@ -24,7 +24,6 @@ import androidx.transition.TransitionInflater
 import com.bolunevdev.core_api.entity.Film
 import com.bolunevdev.kinon.R
 import com.bolunevdev.kinon.databinding.FragmentDetailsBinding
-import com.bolunevdev.kinon.notifications.WatchLaterNotificationHelper
 import com.bolunevdev.kinon.utils.AutoDisposable
 import com.bolunevdev.kinon.utils.addTo
 import com.bolunevdev.kinon.view.activities.MainActivity
@@ -38,17 +37,18 @@ import com.bumptech.glide.request.target.Target
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import java.util.*
 
 
 class DetailsFragment : Fragment() {
+
     private val viewModel: DetailsFragmentViewModel by activityViewModels()
-    private lateinit var binding: FragmentDetailsBinding
-    private lateinit var film: Film
+    private var _binding: FragmentDetailsBinding? = null
+    private val binding get() = _binding!!
+    private var film: Film? = null
     private var favoriteFilms = mutableListOf<Film>()
     private val autoDisposable = AutoDisposable()
-    private lateinit var notificationHelper: WatchLaterNotificationHelper
 
     init {
         enterTransition = Fade(Fade.IN).apply { duration = MainActivity.TRANSITION_DURATION }
@@ -60,7 +60,7 @@ class DetailsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentDetailsBinding.inflate(inflater, container, false)
+        _binding = FragmentDetailsBinding.inflate(inflater, container, false)
         postponeEnterTransition()
         return binding.root
     }
@@ -69,7 +69,7 @@ class DetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         (requireActivity() as MainActivity)
-            .findViewById<FrameLayout>(R.id.background_share_transition)
+            .findViewById<FrameLayout>(R.id.backgroundShareTransition)
             .visibility = View.VISIBLE
 
         bindAutoDisposable()
@@ -107,9 +107,9 @@ class DetailsFragment : Fragment() {
         binding.detailsFabFavorites.setOnClickListener {
             Completable.fromAction {
                 if (!favoriteFilms.contains(film)) {
-                    viewModel.addToFavoritesFilms(film)
+                    film?.let { it1 -> viewModel.addToFavoritesFilms(it1) }
                 } else {
-                    viewModel.deleteFromFavoritesFilms(film.id)
+                    film?.let { it1 -> viewModel.deleteFromFavoritesFilms(it1.id) }
                 }
             }
                 .subscribeOn(Schedulers.io())
@@ -139,7 +139,7 @@ class DetailsFragment : Fragment() {
             //Кладем данные о нашем фильме
             intent.putExtra(
                 Intent.EXTRA_TEXT,
-                "${getString(R.string.CheckOutThisFilm)} ${film.title} \n\n ${film.description}"
+                "${getString(R.string.CheckOutThisFilm)} ${film?.title} \n\n ${film?.description}"
             )
             //Указываем MIME тип, чтобы система знала, какое приложения предложить
             intent.type = MIME_TYPE
@@ -162,12 +162,12 @@ class DetailsFragment : Fragment() {
         }
 
         //Устанавливаем заголовок
-        binding.detailsPoster.transitionName = film.filmId.toString()
-        binding.detailsToolbar.title = film.title
+        binding.detailsPoster.transitionName = film?.filmId.toString()
+        binding.detailsToolbar.title = film?.title
 
         //Устанавливаем картинку
         Glide.with(this)
-            .load(ApiConstants.IMAGES_URL + IMAGE_SIZE + film.poster)
+            .load(ApiConstants.IMAGES_URL + IMAGE_SIZE + film?.poster)
             .error(R.drawable.no_poster_holder)
             .centerCrop()
             .listener(object : RequestListener<Drawable> {
@@ -195,7 +195,7 @@ class DetailsFragment : Fragment() {
             .into(binding.detailsPoster)
 
         //Устанавливаем описание
-        binding.detailsDescription.text = film.description
+        binding.detailsDescription.text = film?.description
     }
 
     private fun setFabFavoritesIcon() {
@@ -211,10 +211,10 @@ class DetailsFragment : Fragment() {
             //Создаем объект для передачи данных
             val contentValues = ContentValues().apply {
                 //Составляем информацию для файла (имя, тип, дата создания, куда сохранять и т.д.)
-                put(MediaStore.Images.Media.TITLE, film.title.handleSingleQuote())
+                put(MediaStore.Images.Media.TITLE, film?.title?.handleSingleQuote())
                 put(
                     MediaStore.Images.Media.DISPLAY_NAME,
-                    film.title.handleSingleQuote()
+                    film?.title?.handleSingleQuote()
                 )
                 put(MediaStore.Images.Media.MIME_TYPE, IMAGE_TYPE)
                 put(
@@ -242,8 +242,8 @@ class DetailsFragment : Fragment() {
             MediaStore.Images.Media.insertImage(
                 requireActivity().contentResolver,
                 bitmap,
-                film.title.handleSingleQuote(),
-                film.description.handleSingleQuote()
+                film?.title?.handleSingleQuote(),
+                film?.description?.handleSingleQuote()
             )
         }
     }
@@ -260,7 +260,7 @@ class DetailsFragment : Fragment() {
             return
         }
 
-        viewModel.loadWallpaper(ApiConstants.IMAGES_URL + "original" + film.poster)
+        viewModel.loadWallpaper(ApiConstants.IMAGES_URL + "original" + film?.poster)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
@@ -319,13 +319,13 @@ class DetailsFragment : Fragment() {
 
     private fun initDetailsFabWatchLater() {
         binding.detailsFabWatchLater.setOnClickListener {
-            notificationHelper = WatchLaterNotificationHelper(requireContext())
-            Observable.just(film)
-                .subscribeOn(Schedulers.newThread())
-                .subscribe { film ->
-                    notificationHelper.sendWatchLaterNotification(film)
-                }.addTo(autoDisposable)
+            context?.let { it1 -> viewModel.createAlarm(it1, film as Film) }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {

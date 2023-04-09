@@ -5,16 +5,26 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
-import com.bolunevdev.kinon.view.rv_viewholders.FilmViewHolder.Companion.RATING_MULTIPLIER
 import com.bolunevdev.kinon.R
+import com.bolunevdev.kinon.view.rv_viewholders.FilmViewHolder.Companion.RATING_MULTIPLIER
 
 
 class RatingDonutView @JvmOverloads constructor(
     context: Context,
     attributeSet: AttributeSet? = null
 ) : View(context, attributeSet) {
-    private lateinit var backgroundBitmap: Bitmap
-    private lateinit var backgroundStaticCanvas: Canvas
+
+    private val backgroundBitmap: Bitmap by lazy {
+        Bitmap.createBitmap(
+            (centerX * 2).toInt(),
+            (centerY * 2).toInt(),
+            Bitmap.Config.ARGB_8888
+        )
+    }
+    private val backgroundStaticCanvas: Canvas by lazy {
+        Canvas(backgroundBitmap)
+    }
+
     private var isStaticBackgroundDrawn: Boolean = false
 
     //Овал для рисования сегментов прогресс бара
@@ -35,12 +45,11 @@ class RatingDonutView @JvmOverloads constructor(
     private var scaleSize = 60f
 
     //Краски для наших фигур
-    private lateinit var strokePaint: Paint
-    private lateinit var digitPaint: Paint
-    private lateinit var circlePaint: Paint
-    private var isFirstRun: Boolean = true
+    private var strokePaint: Paint? = null
+    private var digitPaint: Paint? = null
+    private var circlePaint: Paint? = null
 
-    private lateinit var message: String
+    private var isFirstRun: Boolean = true
 
     init {
         //Получаем атрибуты и устанавливаем их в соответствующие поля
@@ -136,7 +145,7 @@ class RatingDonutView @JvmOverloads constructor(
         val minSide = chosenWidth.coerceAtMost(chosenHeight)
         centerX = minSide.div(2f)
         centerY = minSide.div(2f)
-        message = String.format("%.1f", progress / 10f)
+        String.format("%.1f", progress / 10f)
 
         setMeasuredDimension(minSide, minSide)
     }
@@ -157,7 +166,12 @@ class RatingDonutView @JvmOverloads constructor(
         //Устанавливаем размеры под наш овал
         oval.set(0f - scale, 0f - scale, scale, scale)
         //Рисуем "арки", из них и будет состоять наше кольцо + у нас тут специальный метод
-        canvas.drawArc(oval, -90f, convertProgressToDegrees(progress), false, strokePaint)
+        strokePaint?.let {
+            canvas.drawArc(
+                oval, -90f, convertProgressToDegrees(progress), false,
+                it
+            )
+        }
         //Восстанавливаем канвас
         canvas.restore()
     }
@@ -170,11 +184,16 @@ class RatingDonutView @JvmOverloads constructor(
         //Получаем ширину и высоту текста, чтобы компенсировать их при отрисовке, чтобы текст был
         //точно в центре
         val widths = FloatArray(message.length)
-        digitPaint.getTextWidths(message, widths)
+        digitPaint?.getTextWidths(message, widths)
         var advance = 0f
         for (width in widths) advance += width
         //Рисуем наш текст
-        canvas.drawText(message, centerX - advance / 2, centerY + advance / 4, digitPaint)
+        digitPaint?.let {
+            canvas.drawText(
+                message, centerX - advance / 2, centerY + advance / 4,
+                it
+            )
+        }
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -190,12 +209,6 @@ class RatingDonutView @JvmOverloads constructor(
     }
 
     private fun drawStaticBackground() {
-        backgroundBitmap = Bitmap.createBitmap(
-            (centerX * 2).toInt(),
-            (centerY * 2).toInt(),
-            Bitmap.Config.ARGB_8888
-        )
-        backgroundStaticCanvas = Canvas(backgroundBitmap)
         drawBackground(backgroundStaticCanvas)
 
         isStaticBackgroundDrawn = true
@@ -206,7 +219,7 @@ class RatingDonutView @JvmOverloads constructor(
 
         canvas.translate(centerX, centerY)
 
-        canvas.drawCircle(0f, 0f, radius, circlePaint)
+        circlePaint?.let { canvas.drawCircle(0f, 0f, radius, it) }
     }
 
     fun setProgress(pr: Int) {

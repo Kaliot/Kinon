@@ -1,5 +1,6 @@
 package com.bolunevdev.kinon.viewmodel
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,7 @@ import java.net.URL
 import javax.inject.Inject
 
 class DetailsFragmentViewModel : ViewModel() {
+
     val filmsListObservable: Observable<List<Film>>
 
     //Инициализируем интерактор
@@ -36,5 +38,9 @@ class DetailsFragmentViewModel : ViewModel() {
             val posterUrl = URL(url)
             BitmapFactory.decodeStream(posterUrl.openConnection().getInputStream())
         }
+    }
+
+    fun createAlarm(context: Context, film: Film) {
+        interactor.addAlarm(context, film)
     }
 }

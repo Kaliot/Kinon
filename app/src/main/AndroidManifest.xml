@@ -33,6 +33,7 @@
             android:name=".view.activities.MainActivity"
             android:exported="true">
         </activity>
+        <receiver android:name=".receivers.WatchLaterNotificationReceiver"/>
     </application>
 
 </manifest>

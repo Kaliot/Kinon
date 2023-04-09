@@ -14,7 +14,10 @@ import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.viewmodel.SettingsFragmentViewModel
 
 class SettingsFragment : Fragment() {
-    private lateinit var binding: FragmentSettingsBinding
+
+    private var _binding: FragmentSettingsBinding? = null
+    private val binding get() = _binding!!
+
     private val viewModel by lazy {
         ViewModelProvider.NewInstanceFactory().create(SettingsFragmentViewModel::class.java)
     }
@@ -28,7 +31,7 @@ class SettingsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentSettingsBinding.inflate(layoutInflater, container, false)
+        _binding = FragmentSettingsBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
@@ -43,21 +46,26 @@ class SettingsFragment : Fragment() {
         //Слушаем, какой у нас сейчас выбран вариант в настройках
         viewModel.categoryPropertyLifeData.observe(viewLifecycleOwner) {
             when (it) {
-                POPULAR_CATEGORY -> binding.radioGroup.check(R.id.radio_popular)
-                TOP_RATED_CATEGORY -> binding.radioGroup.check(R.id.radio_top_rated)
-                UPCOMING_CATEGORY -> binding.radioGroup.check(R.id.radio_upcoming)
-                NOW_PLAYING_CATEGORY -> binding.radioGroup.check(R.id.radio_now_playing)
+                POPULAR_CATEGORY -> binding.radioGroup.check(R.id.radioPopular)
+                TOP_RATED_CATEGORY -> binding.radioGroup.check(R.id.radioTopRated)
+                UPCOMING_CATEGORY -> binding.radioGroup.check(R.id.radioUpcoming)
+                NOW_PLAYING_CATEGORY -> binding.radioGroup.check(R.id.radioNowPlaying)
             }
         }
         //Слушатель для отправки нового состояния в настройки
         binding.radioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
-                R.id.radio_popular -> viewModel.putCategoryProperty(POPULAR_CATEGORY)
-                R.id.radio_top_rated -> viewModel.putCategoryProperty(TOP_RATED_CATEGORY)
-                R.id.radio_upcoming -> viewModel.putCategoryProperty(UPCOMING_CATEGORY)
-                R.id.radio_now_playing -> viewModel.putCategoryProperty(NOW_PLAYING_CATEGORY)
+                R.id.radioPopular -> viewModel.putCategoryProperty(POPULAR_CATEGORY)
+                R.id.radioTopRated -> viewModel.putCategoryProperty(TOP_RATED_CATEGORY)
+                R.id.radioUpcoming -> viewModel.putCategoryProperty(UPCOMING_CATEGORY)
+                R.id.radioNowPlaying -> viewModel.putCategoryProperty(NOW_PLAYING_CATEGORY)
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {

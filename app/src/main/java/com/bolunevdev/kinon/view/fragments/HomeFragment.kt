@@ -33,11 +33,63 @@ import java.util.concurrent.TimeUnit
 
 
 class HomeFragment : Fragment() {
+
     private val viewModel: HomeFragmentViewModel by activityViewModels()
-    private lateinit var binding: FragmentHomeBinding
-    private lateinit var filmsAdapter: FilmListRecyclerAdapter
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var scrollListener: RecyclerView.OnScrollListener
+
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
+
+    private val filmsAdapter: FilmListRecyclerAdapter by lazy {
+        FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
+            override fun click(film: Film, poster: ImageView) {
+                (requireActivity() as MainActivity).launchDetailsFragment(
+                    film,
+                    R.id.actionHomeFragmentToDetailsFragment,
+                    poster
+                )
+                isShare = true
+            }
+        }, object : FilmListRecyclerAdapter.OnItemLongClickListener {
+            override fun longClick(film: Film) {
+                (requireActivity() as MainActivity).copyFilmTitle(film)
+            }
+        })
+    }
+
+    private var recyclerView: RecyclerView? = null
+
+    private val scrollListener: RecyclerView.OnScrollListener by lazy {
+        object : RecyclerView.OnScrollListener() {
+            @Override
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val layoutManager = recyclerView.layoutManager as RecyclerView.LayoutManager
+                //смотрим сколько элементов на экране
+                val visibleItemCount: Int = layoutManager.childCount
+                //сколько всего элементов
+                totalItemCount = layoutManager.itemCount
+
+                //какая позиция первого элемента
+                val firstVisibleItems =
+                    (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                //проверяем, грузим мы что-то или нет
+                if (!isLoading) {
+                    if (visibleItemCount + firstVisibleItems >= totalItemCount - VISIBLE_THRESHOLD) {
+                        //ставим флаг, что мы попросили еще элементы
+                        isLoading = true
+                        //Вызывает загрузку данных в RecyclerView
+                        if (isSearchRequestEmpty) {
+                            viewModel.increasePageNumber()
+                            viewModel.getFilmsFromApi()
+                        } else {
+                            viewModel.increaseSearchedPageNumber()
+                            loadSearchFilms()
+                        }
+                    }
+                }
+            }
+        }
+    }
     private var isShare: Boolean = false
     private var totalItemCount = DEFAULT_TOTAL_ITEM_COUNT
     private val autoDisposable = AutoDisposable()
@@ -51,7 +103,7 @@ class HomeFragment : Fragment() {
                 PreferenceProvider.KEY_DEFAULT_CATEGORY -> {
                     changeCategory()
                     //Перемещаемся на первую позицию
-                    recyclerView.scrollToPosition(0)
+                    recyclerView?.scrollToPosition(0)
                 }
             }
         }
@@ -73,7 +125,7 @@ class HomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
         postponeEnterTransition()
         return binding.root
     }
@@ -143,37 +195,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun addRVScrollListener() {
-        scrollListener = object : RecyclerView.OnScrollListener() {
-            @Override
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val layoutManager = recyclerView.layoutManager as RecyclerView.LayoutManager
-                //смотрим сколько элементов на экране
-                val visibleItemCount: Int = layoutManager.childCount
-                //сколько всего элементов
-                totalItemCount = layoutManager.itemCount
-
-                //какая позиция первого элемента
-                val firstVisibleItems =
-                    (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                //проверяем, грузим мы что-то или нет
-                if (!isLoading) {
-                    if (visibleItemCount + firstVisibleItems >= totalItemCount - VISIBLE_THRESHOLD) {
-                        //ставим флаг, что мы попросили еще элементы
-                        isLoading = true
-                        //Вызывает загрузку данных в RecyclerView
-                        if (isSearchRequestEmpty) {
-                            viewModel.increasePageNumber()
-                            viewModel.getFilmsFromApi()
-                        } else {
-                            viewModel.increaseSearchedPageNumber()
-                            loadSearchFilms()
-                        }
-                    }
-                }
-            }
-        }
-        recyclerView.addOnScrollListener(scrollListener)
+        recyclerView?.addOnScrollListener(scrollListener)
     }
 
     private fun initRVTreeObserver() {
@@ -217,7 +239,7 @@ class HomeFragment : Fragment() {
                 searchRequest = it
                 searchFilmsList.clear()
                 viewModel.resetSearchedPageNumber()
-                recyclerView.smoothScrollToPosition(0)
+                recyclerView?.smoothScrollToPosition(0)
                 loadSearchFilms()
             }, {
                 viewModel.interactor.showServerError(true)
@@ -250,29 +272,12 @@ class HomeFragment : Fragment() {
         //находим наш RV
         recyclerView = binding.mainRecycler
 
-        recyclerView.apply {
-            //Инициализируем наш адаптер в конструктор передаем анонимно инициализированный интерфейс,
-            filmsAdapter =
-                FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
-                    override fun click(film: Film, poster: ImageView) {
-
-                        (requireActivity() as MainActivity).launchDetailsFragment(
-                            film,
-                            R.id.action_homeFragment_to_detailsFragment,
-                            poster
-                        )
-                        isShare = true
-                    }
-                }, object : FilmListRecyclerAdapter.OnItemLongClickListener {
-                    override fun longClick(film: Film) {
-                        (requireActivity() as MainActivity).copyFilmTitle(film)
-                    }
-                })
+        recyclerView?.apply {
             //Присваиваем адаптер
-            recyclerView.adapter = filmsAdapter
+            recyclerView?.adapter = filmsAdapter
             //Присвоим layoutManager
             val layoutManager = LinearLayoutManager(requireContext())
-            recyclerView.layoutManager = layoutManager
+            recyclerView?.layoutManager = layoutManager
             //Применяем декоратор для отступов
             val decorator = TopSpacingItemDecoration(DECORATOR_PADDING_IN_DP)
             addItemDecoration(decorator)
@@ -325,11 +330,12 @@ class HomeFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         viewModel.unregisterPreferencesListener(sharedChangeListener)
+        _binding = null
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        recyclerView.removeOnScrollListener(scrollListener)
+        recyclerView?.removeOnScrollListener(scrollListener)
     }
 
     companion object {

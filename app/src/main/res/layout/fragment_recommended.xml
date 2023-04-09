@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/recommended_fragment_root"
+    android:id="@+id/recommendedFragmentRoot"
     style="@style/activity_main_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"

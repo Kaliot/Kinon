@@ -8,7 +8,7 @@
     tools:context=".view.fragments.ExitMenuFragment">
 
     <TextView
-        android:id="@+id/text_header"
+        android:id="@+id/textHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -22,23 +22,24 @@
         android:layout_height="wrap_content">
 
         <Button
-            android:id="@+id/btn_y"
+            android:id="@+id/btnY"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
+            android:layout_margin="@dimen/exit_menu_buttons_margin"
             android:layout_weight="50"
             android:text="@string/exit_menu_btn_y"
             android:textColor="@color/white" />
 
         <Button
-            android:id="@+id/btn_n"
+            android:id="@+id/btnN"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
+            android:layout_margin="@dimen/exit_menu_buttons_margin"
             android:layout_weight="50"
             android:text="@string/exit_menu_btn_n"
             android:textColor="@color/white" />
+
     </LinearLayout>
 </LinearLayout>

@@ -5,8 +5,8 @@ import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.FrameLayout
-import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.R
+import com.bolunevdev.kinon.view.activities.MainActivity
 import java.util.concurrent.Executors
 import kotlin.math.hypot
 import kotlin.math.roundToInt
@@ -29,7 +29,7 @@ object AnimationHelper {
                 if (rootView.isAttachedToWindow && rootView.visibility == View.INVISIBLE) {
                     //Возвращаемся в главный тред, чтобы выполнить анимацию
                     activity.runOnUiThread {
-                        activity.findViewById<FrameLayout>(R.id.background_share_transition).visibility =
+                        activity.findViewById<FrameLayout>(R.id.backgroundShareTransition).visibility =
                             View.GONE
                         //Cупер сложная математика вычесления старта анимации
                         val centerMultiplier = 2

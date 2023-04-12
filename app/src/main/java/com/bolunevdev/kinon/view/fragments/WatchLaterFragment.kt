@@ -4,57 +4,60 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import android.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Fade
-import com.bolunevdev.core_api.entity.Film
+import com.bolunevdev.core_api.entity.Alarm
 import com.bolunevdev.kinon.R
-import com.bolunevdev.kinon.databinding.FragmentFavoritesBinding
+import com.bolunevdev.kinon.databinding.FragmentWatchLaterBinding
 import com.bolunevdev.kinon.utils.AnimationHelper
 import com.bolunevdev.kinon.utils.AutoDisposable
 import com.bolunevdev.kinon.utils.addTo
 import com.bolunevdev.kinon.view.activities.MainActivity
-import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
+import com.bolunevdev.kinon.view.rv_adapters.AlarmListRecyclerAdapter
 import com.bolunevdev.kinon.view.rv_adapters.TopSpacingItemDecoration
-import com.bolunevdev.kinon.viewmodel.FavoritesFragmentViewModel
+import com.bolunevdev.kinon.viewmodel.WatchLaterFragmentViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 
-class FavoritesFragment : Fragment() {
+class WatchLaterFragment : Fragment() {
 
     private val viewModel by lazy {
-        ViewModelProvider.NewInstanceFactory().create(FavoritesFragmentViewModel::class.java)
+        ViewModelProvider.NewInstanceFactory().create(WatchLaterFragmentViewModel::class.java)
     }
-
-    private var _binding: FragmentFavoritesBinding? = null
+    private var _binding: FragmentWatchLaterBinding? = null
     private val binding get() = _binding!!
 
-    private val filmsAdapter: FilmListRecyclerAdapter by lazy {
-        FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
-            override fun click(film: Film, poster: ImageView) {
-                (requireActivity() as MainActivity).launchDetailsFragment(
-                    film,
-                    R.id.actionFavoritesToDetailsFragment,
-                    poster
-                )
-                isShare = true
-            }
-        }, object : FilmListRecyclerAdapter.OnItemLongClickListener {
-            override fun longClick(film: Film) {
-                (requireActivity() as MainActivity).copyFilmTitle(film)
+    private val alarmAdapter: AlarmListRecyclerAdapter by lazy {
+        AlarmListRecyclerAdapter(object : AlarmListRecyclerAdapter.OnMenuButtonClickListener {
+            override fun click(alarm: Alarm, menuButton: View) {
+                val popupMenu = PopupMenu(requireContext(), menuButton)
+                popupMenu.menuInflater.inflate(R.menu.alarm_menu, popupMenu.menu)
+                popupMenu.setOnMenuItemClickListener { item ->
+                    when (item.itemId) {
+                        R.id.editAlarm -> {
+                            context?.let { viewModel.editAlarm(it, alarm) }
+                            true
+                        }
+                        R.id.deleteAlarm -> {
+                            context?.let { viewModel.cancelAlarm(it, alarm) }
+                            true
+                        }
+                        else -> false
+                    }
+                }
+                popupMenu.show()
             }
         })
     }
-
     private var recyclerView: RecyclerView? = null
 
-    private var isShare: Boolean = false
     private val autoDisposable = AutoDisposable()
-    private var filmsDataBase = mutableListOf<Film>()
+    private var alarmDataBase = mutableListOf<Alarm>()
         //Используем backing field
         set(value) {
             //Если придет такое же значение, то мы выходим из метода
@@ -62,18 +65,25 @@ class FavoritesFragment : Fragment() {
             //Если пришло другое значение, то кладем его в переменную
             field = value
             //Обновляем RV адаптер
-            filmsAdapter.updateData(field)
+            alarmAdapter.updateData(field)
         }
 
     init {
-        reenterTransition = Fade(Fade.IN).apply { duration = MainActivity.TRANSITION_DURATION }
+        enterTransition = Fade(Fade.IN).apply { duration = MainActivity.TRANSITION_DURATION }
+        returnTransition = Fade(Fade.OUT).apply { duration = MainActivity.TRANSITION_DURATION }
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentFavoritesBinding.inflate(inflater, container, false)
-        postponeEnterTransition()
+        _binding = FragmentWatchLaterBinding.inflate(inflater, container, false)
+        val menuPosition = 2
+        AnimationHelper.performFragmentCircularRevealAnimation(
+            binding.root,
+            requireActivity(),
+            menuPosition
+        )
         // Inflate the layout for this fragment
         return binding.root
     }
@@ -81,17 +91,13 @@ class FavoritesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        exitTransition = null
-
         startCircularRevealAnimation()
 
         initRV()
 
         bindAutoDisposable()
 
-        loadFilmsDataBase()
-
-        initRVTreeObserver()
+        loadAlarmsDataBase()
     }
 
     private fun bindAutoDisposable() {
@@ -99,34 +105,23 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun startCircularRevealAnimation() {
-        if (!isShare) {
-            val menuPosition = 3
-            AnimationHelper
-                .performFragmentCircularRevealAnimation(
-                    binding.root,
-                    requireActivity(),
-                    menuPosition
-                )
-            return
-        }
-        binding.root.visibility = View.VISIBLE
-        isShare = false
+        val menuPosition = 3
+        AnimationHelper
+            .performFragmentCircularRevealAnimation(
+                binding.root,
+                requireActivity(),
+                menuPosition
+            )
+        return
     }
 
-    private fun initRVTreeObserver() {
-        binding.favoritesRecycler.viewTreeObserver
-            .addOnPreDrawListener {
-                startPostponedEnterTransition()
-                true
-            }
-    }
 
     private fun initRV() {
         //находим наш RV
-        recyclerView = binding.favoritesRecycler
+        recyclerView = binding.watchLaterRecyclerView
         recyclerView?.apply {
             //Присваиваем адаптер
-            recyclerView?.adapter = filmsAdapter
+            recyclerView?.adapter = alarmAdapter
 
             //Присвоим layoutManager
             val layoutManager = LinearLayoutManager(requireContext())
@@ -138,19 +133,19 @@ class FavoritesFragment : Fragment() {
         }
     }
 
-    private fun loadFilmsDataBase() {
-        viewModel.filmsListObservable
+    private fun loadAlarmsDataBase() {
+        viewModel.alarmListObservable
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .onErrorComplete()
             .subscribe {
-                filmsDataBase = it as MutableList<Film>
-                filmsAdapter.updateData(filmsDataBase)
+                alarmDataBase = it as MutableList<Alarm>
+                alarmAdapter.updateData(alarmDataBase)
             }.addTo(autoDisposable)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         _binding = null
     }
 

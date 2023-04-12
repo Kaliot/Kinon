@@ -6,14 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.transition.Fade
-import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.databinding.FragmentRecommendedBinding
 import com.bolunevdev.kinon.utils.AnimationHelper
+import com.bolunevdev.kinon.view.activities.MainActivity
 
 
 class RecommendedFragment : Fragment() {
 
-    private lateinit var binding: FragmentRecommendedBinding
+    private var _binding: FragmentRecommendedBinding? = null
+    private val binding get() = _binding!!
 
     init {
         enterTransition = Fade(Fade.IN).apply { duration = MainActivity.TRANSITION_DURATION }
@@ -24,7 +25,7 @@ class RecommendedFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentRecommendedBinding.inflate(inflater, container, false)
+        _binding = FragmentRecommendedBinding.inflate(inflater, container, false)
         val menuPosition = 4
         AnimationHelper.performFragmentCircularRevealAnimation(
             binding.root,
@@ -33,5 +34,10 @@ class RecommendedFragment : Fragment() {
         )
         // Inflate the layout for this fragment
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

@@ -5,18 +5,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.databinding.FragmentExitMenuBinding
+import com.bolunevdev.kinon.view.activities.MainActivity
 
 
 class ExitMenuFragment : DialogFragment() {
-    private lateinit var binding: FragmentExitMenuBinding
+
+    private var _binding: FragmentExitMenuBinding? = null
+    private val binding get() = _binding!!
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentExitMenuBinding.inflate(inflater, container, false)
+        _binding = FragmentExitMenuBinding.inflate(inflater, container, false)
         dialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
         return binding.root
     }
@@ -30,5 +32,10 @@ class ExitMenuFragment : DialogFragment() {
         binding.btnN.setOnClickListener {
             dialog?.let { it1 -> super.onDismiss(it1) }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

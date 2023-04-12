@@ -31,8 +31,8 @@ class MainActivityTest {
 
     @Test
     fun recyclerViewShouldBeAttached() {
-        onView(withId(R.id.main_recycler)).check(matches(isDisplayed()))
-        onView(withId(R.id.main_recycler)).perform(
+        onView(withId(R.id.mainRecycler)).check(matches(isDisplayed()))
+        onView(withId(R.id.mainRecycler)).perform(
             RecyclerViewActions.actionOnItemAtPosition<FilmViewHolder>(
                 0,
                 click()
@@ -43,46 +43,46 @@ class MainActivityTest {
     @Test
     fun searchViewShouldBeAbleToInputText() {
         val testString = "1111111"
-        onView(withId(R.id.search_view)).check(matches(isDisplayed()))
-        onView(withId(R.id.search_view)).perform(typeSearchViewText(testString))
+        onView(withId(R.id.searchView)).check(matches(isDisplayed()))
+        onView(withId(R.id.searchView)).perform(typeSearchViewText(testString))
     }
 
     @Test
     fun allMenuDestinationsShouldWork() {
-        onView(withId(R.id.favorites_root)).perform(click())
-        onView(withId(R.id.favorites_fragment_root)).check(matches(isDisplayed()))
+        onView(withId(R.id.favoritesRoot)).perform(click())
+        onView(withId(R.id.favoritesFragmentRoot)).check(matches(isDisplayed()))
 
-        onView(withId(R.id.new_titles_root)).perform(click())
-        onView(withId(R.id.new_titles_fragment_root)).check(matches(isDisplayed()))
+        onView(withId(R.id.watchLaterRoot)).perform(click())
+        onView(withId(R.id.watchLaterFragmentRoot)).check(matches(isDisplayed()))
 
-        onView(withId(R.id.recommended_root)).perform(click())
-        onView(withId(R.id.recommended_fragment_root)).check(matches(isDisplayed()))
+        onView(withId(R.id.recommendedRoot)).perform(click())
+        onView(withId(R.id.recommendedFragmentRoot)).check(matches(isDisplayed()))
 
-        onView(withId(R.id.home_root)).perform(click())
-        onView(withId(R.id.home_fragment_root)).check(matches(isDisplayed()))
+        onView(withId(R.id.homeRoot)).perform(click())
+        onView(withId(R.id.homeFragmentRoot)).check(matches(isDisplayed()))
     }
 
     @Test
     fun shouldOpenDetailsFragment() {
-        onView(withId(R.id.main_recycler)).perform(
+        onView(withId(R.id.mainRecycler)).perform(
             RecyclerViewActions.actionOnItemAtPosition<FilmViewHolder>(
                 0,
                 click()
             )
         )
-        onView(withId(R.id.app_bar)).check(matches(isDisplayed()))
+        onView(withId(R.id.appBar)).check(matches(isDisplayed()))
     }
 
     @Test
     fun addToFavoritesButtonClickable() {
-        onView(withId(R.id.main_recycler)).perform(
+        onView(withId(R.id.mainRecycler)).perform(
             RecyclerViewActions.actionOnItemAtPosition<FilmViewHolder>(
                 0,
                 click()
             )
         )
-        onView(withId(R.id.details_fab_favorites)).perform(click())
-        onView(withId(R.id.details_fab_favorites)).perform(click())
+        onView(withId(R.id.detailsFabFavorites)).perform(click())
+        onView(withId(R.id.detailsFabFavorites)).perform(click())
     }
 
     //UI Automator tests

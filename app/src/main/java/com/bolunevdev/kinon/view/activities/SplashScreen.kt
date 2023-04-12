@@ -15,8 +15,8 @@ class SplashScreen : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
 
-        findViewById<LottieAnimationView>(R.id.start_animation)
-        val lottieAnimationView: LottieAnimationView = findViewById(R.id.start_animation)
+        findViewById<LottieAnimationView>(R.id.startAnimation)
+        val lottieAnimationView: LottieAnimationView = findViewById(R.id.startAnimation)
         lottieAnimationView.playAnimation()
 
         Executors.newSingleThreadExecutor().execute {

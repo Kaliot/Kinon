@@ -9,28 +9,29 @@
     tools:context=".view.activities.MainActivity">
 
     <FrameLayout
-        android:id="@+id/background_share_transition"
+        android:id="@+id/backgroundShareTransition"
         style="@style/activity_main_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragment_placeholder"
+        android:id="@+id/fragmentPlaceholder"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/navigation" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
+        android:id="@+id/bottomNavigation"
         style="@style/Widget.MaterialComponents.BottomNavigationView.Colored"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/navigation_menu" />
+        app:menu="@menu/navigation_menu"
+        tools:ignore="VisualLintBottomNav" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

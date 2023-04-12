@@ -2,14 +2,14 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/item_container"
+    android:id="@+id/itemContainer"
     android:layout_width="match_parent"
     android:layout_height="@dimen/item_container_height"
     android:elevation="@dimen/item_container_elevation"
     app:cardCornerRadius="@dimen/item_container_radius">
 
     <com.bolunevdev.kinon.view.customviews.RatingDonutView
-        android:id="@+id/rating_donut"
+        android:id="@+id/ratingDonut"
         android:layout_width="@dimen/rating_donut_diameter"
         android:layout_height="@dimen/rating_donut_diameter"
         android:layout_gravity="bottom|start"

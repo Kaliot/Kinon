@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/settings_fragment_root"
+    android:id="@+id/settingsFragmentRoot"
     style="@style/activity_main_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,7 +10,7 @@
     tools:visibility="visible">
 
     <RadioGroup
-        android:id="@+id/radio_group"
+        android:id="@+id/radioGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -24,7 +24,7 @@
             android:textColor="@android:color/white" />
 
         <RadioButton
-            android:id="@+id/radio_popular"
+            android:id="@+id/radioPopular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/radio_group_button_margin"
@@ -33,7 +33,7 @@
             android:textColor="@android:color/white" />
 
         <RadioButton
-            android:id="@+id/radio_top_rated"
+            android:id="@+id/radioTopRated"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/radio_group_button_margin"
@@ -42,7 +42,7 @@
             android:textColor="@android:color/white" />
 
         <RadioButton
-            android:id="@+id/radio_upcoming"
+            android:id="@+id/radioUpcoming"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/radio_group_button_margin"
@@ -51,12 +51,13 @@
             android:textColor="@android:color/white" />
 
         <RadioButton
-            android:id="@+id/radio_now_playing"
+            android:id="@+id/radioNowPlaying"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/radio_group_button_margin"
             android:layout_marginRight="@dimen/radio_group_button_margin"
             android:text="@string/radio_button_playing"
             android:textColor="@android:color/white" />
+
     </RadioGroup>
 </FrameLayout>

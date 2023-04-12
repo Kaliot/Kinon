@@ -9,7 +9,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 //Наследуем от DefaultLifecycleObserver
 class AutoDisposable : DefaultLifecycleObserver {
     //Используем CompositeDisposable для отмены всех Observable
-    private lateinit var compositeDisposable: CompositeDisposable
+    private var compositeDisposable: CompositeDisposable? = null
 
     //Сюда передаем ссылку на ЖЦ компонента, за которым будет слежение
     fun bindTo(lifecycle: Lifecycle) {
@@ -19,15 +19,13 @@ class AutoDisposable : DefaultLifecycleObserver {
 
     //Метод для добавления Observable в CompositeDisposable
     fun add(disposable: Disposable) {
-        if (::compositeDisposable.isInitialized) {
-            compositeDisposable.add(disposable)
-        } else {
-            throw NotImplementedError(NOT_IMPLEMENTED_ERROR_MESSAGE)
-        }
+        compositeDisposable?.add(disposable) ?: throw NotImplementedError(
+            NOT_IMPLEMENTED_ERROR_MESSAGE
+        )
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
-        compositeDisposable.dispose()
+        compositeDisposable?.dispose()
     }
 
     companion object {

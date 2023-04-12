@@ -23,7 +23,7 @@ class FilmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val title = itemView.findViewById<TextView>(R.id.title)
     private val poster = itemView.findViewById<ImageView>(R.id.poster)
     private val description = itemView.findViewById<TextView>(R.id.description)
-    private val ratingDonut = itemView.findViewById<RatingDonutView>(R.id.rating_donut)
+    private val ratingDonut = itemView.findViewById<RatingDonutView>(R.id.ratingDonut)
 
     //В этом методе кладем данные из Film в наши View
     fun bind(
@@ -49,7 +49,7 @@ class FilmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         //Обрабатываем нажатие на весь элемент целиком(можно сделать на отдельный элемент
         //например, картинку) и вызываем метод нашего листенера, который мы получаем из
         //конструктора адаптера
-        itemView.findViewById<View>(R.id.item_container).setOnClickListener {
+        itemView.findViewById<View>(R.id.itemContainer).setOnClickListener {
             it.findFragment<Fragment>().exitTransition = TransitionSet().apply {
                 addTransition(
                     Fade(Fade.OUT)
@@ -65,7 +65,7 @@ class FilmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             clickListener.click(film, poster)
         }
 
-        itemView.findViewById<View>(R.id.item_container).setOnLongClickListener {
+        itemView.findViewById<View>(R.id.itemContainer).setOnLongClickListener {
             longClickListener.longClick(film)
             return@setOnLongClickListener true
         }

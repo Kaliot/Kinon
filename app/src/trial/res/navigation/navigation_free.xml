@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/homeRoot">
+
+    <navigation
+        android:id="@+id/homeRoot"
+        app:startDestination="@id/home">
+        <fragment
+            android:id="@+id/home"
+            android:name="com.bolunevdev.kinon.view.fragments.HomeFragment"
+            android:label="fragment_home"
+            tools:layout="@layout/fragment_home">
+            <action
+                android:id="@+id/actionHomeFragmentToDetailsFragment"
+                app:destination="@id/detailsFragmentHome" />
+            <action
+                android:id="@+id/actionHomeFragmentToExitMenuFragment"
+                app:destination="@id/exitMenuFragment"
+                app:enterAnim="@android:anim/fade_in"
+                app:exitAnim="@android:anim/fade_out"
+                app:popEnterAnim="@android:anim/fade_in"
+                app:popExitAnim="@android:anim/fade_out" />
+        </fragment>
+
+        <fragment
+            android:id="@+id/detailsFragmentHome"
+            android:name="com.bolunevdev.kinon.view.fragments.DetailsFragment"
+            android:label="fragment_details"
+            tools:layout="@layout/fragment_details" />
+
+        <dialog
+            android:id="@+id/exitMenuFragment"
+            android:name="com.bolunevdev.kinon.view.fragments.ExitMenuFragment"
+            android:label="fragment_exit_menu"
+            tools:layout="@layout/fragment_exit_menu" />
+    </navigation>
+
+    <navigation
+        android:id="@+id/watchLaterRoot"
+        app:startDestination="@id/newTitles">
+        <fragment
+            android:id="@+id/newTitles"
+            android:name="com.bolunevdev.kinon.view.fragments.WatchLaterFragment"
+            android:label="New_titles"
+            tools:layout="@layout/fragment_watch_later" />
+    </navigation>
+
+    <navigation
+        android:id="@+id/settingsRoot"
+        app:startDestination="@id/settings">
+        <fragment
+            android:id="@+id/settings"
+            android:name="com.bolunevdev.kinon.view.fragments.SettingsFragment"
+            android:label="Settings"
+            tools:layout="@layout/fragment_settings" />
+    </navigation>
+
+</navigation>

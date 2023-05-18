@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Fade
@@ -15,20 +15,15 @@ import com.bolunevdev.kinon.R
 import com.bolunevdev.kinon.databinding.FragmentFavoritesBinding
 import com.bolunevdev.kinon.utils.AnimationHelper
 import com.bolunevdev.kinon.utils.AutoDisposable
-import com.bolunevdev.kinon.utils.addTo
 import com.bolunevdev.kinon.view.activities.MainActivity
 import com.bolunevdev.kinon.view.rv_adapters.FilmListRecyclerAdapter
 import com.bolunevdev.kinon.view.rv_adapters.TopSpacingItemDecoration
 import com.bolunevdev.kinon.viewmodel.FavoritesFragmentViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
 
 
 class FavoritesFragment : Fragment() {
 
-    private val viewModel by lazy {
-        ViewModelProvider.NewInstanceFactory().create(FavoritesFragmentViewModel::class.java)
-    }
+    private val viewModel: FavoritesFragmentViewModel by viewModels()
 
     private var _binding: FragmentFavoritesBinding? = null
     private val binding get() = _binding!!
@@ -62,7 +57,7 @@ class FavoritesFragment : Fragment() {
             //Если пришло другое значение, то кладем его в переменную
             field = value
             //Обновляем RV адаптер
-            filmsAdapter.updateData(field)
+            filmsAdapter.submitList(field)
         }
 
     init {
@@ -126,11 +121,10 @@ class FavoritesFragment : Fragment() {
         recyclerView = binding.favoritesRecycler
         recyclerView?.apply {
             //Присваиваем адаптер
-            recyclerView?.adapter = filmsAdapter
+            adapter = filmsAdapter
 
             //Присвоим layoutManager
-            val layoutManager = LinearLayoutManager(requireContext())
-            recyclerView?.layoutManager = layoutManager
+            layoutManager = LinearLayoutManager(requireContext())
 
             //Применяем декоратор для отступов
             val decorator = TopSpacingItemDecoration(DECORATOR_PADDING_IN_DP)
@@ -139,14 +133,10 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun loadFilmsDataBase() {
-        viewModel.filmsListObservable
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .onErrorComplete()
-            .subscribe {
-                filmsDataBase = it as MutableList<Film>
-                filmsAdapter.updateData(filmsDataBase)
-            }.addTo(autoDisposable)
+        viewModel.filmsListLiveData.observe(viewLifecycleOwner) { films ->
+            filmsDataBase = films.toMutableList()
+            filmsAdapter.submitList(filmsDataBase)
+        }
     }
 
     override fun onDestroy() {

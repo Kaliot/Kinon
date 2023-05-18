@@ -1,19 +1,23 @@
 package com.bolunevdev.kinon.viewmodel
 
 import android.content.SharedPreferences
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bolunevdev.core_api.entity.Film
 import com.bolunevdev.kinon.App
 import com.bolunevdev.kinon.domain.Interactor
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.subjects.BehaviorSubject
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import javax.inject.Inject
 
 
 class HomeFragmentViewModel : ViewModel() {
-    val filmsListObservable: Observable<List<Film>>
-    val showProgressBar: BehaviorSubject<Boolean>
-    val showServerError: BehaviorSubject<Boolean>
+    val filmsListLiveData = MutableLiveData<List<Film>>()
+    private val compositeDisposable = CompositeDisposable()
+    val showProgressBar: Observable<Boolean>
+    val showServerError: MutableLiveData<Boolean> = MutableLiveData()
 
     //Инициализируем интерактор
     @Inject
@@ -24,10 +28,19 @@ class HomeFragmentViewModel : ViewModel() {
 
     init {
         App.instance.dagger.inject(this)
-        filmsListObservable = interactor.getFilmsFromDB()
-        showProgressBar = interactor.progressBarSubject
-        showServerError = interactor.serverErrorSubject
+        showProgressBar = interactor.observeProgressBar()
+        handleError()
         getFilms()
+    }
+
+    private fun loadFilms() {
+        compositeDisposable.add(interactor.getFilmsFromDB()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .onErrorComplete()
+            .subscribe {
+                filmsListLiveData.value = it
+            })
     }
 
     private fun getFilms() {
@@ -36,6 +49,7 @@ class HomeFragmentViewModel : ViewModel() {
             getFilmsFromApi()
             setNewTimeOfDatabaseUpdate()
         }
+        else loadFilms()
     }
 
     fun getFilmsFromApi() {
@@ -80,6 +94,20 @@ class HomeFragmentViewModel : ViewModel() {
 
     fun resetSearchedPageNumber() {
         searchPageNumber = 1
+    }
+
+    private fun handleError() {
+        compositeDisposable.add(interactor.observeServerError()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { shouldShowError ->
+                showServerError.value = shouldShowError
+            })
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        compositeDisposable.clear()
     }
 
     companion object {

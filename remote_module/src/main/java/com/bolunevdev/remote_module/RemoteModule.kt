@@ -1,6 +1,5 @@
 package com.bolunevdev.remote_module
 
-import androidx.viewbinding.BuildConfig
 import dagger.Module
 import dagger.Provides
 import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory

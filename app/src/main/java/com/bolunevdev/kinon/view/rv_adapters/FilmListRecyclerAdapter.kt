@@ -4,11 +4,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.ViewCompat
-import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bolunevdev.core_api.entity.Film
 import com.bolunevdev.kinon.R
-import com.bolunevdev.kinon.utils.FilmDiff
+import com.bolunevdev.kinon.utils.FilmDiffCallback
 import com.bolunevdev.kinon.view.rv_viewholders.FilmViewHolder
 
 //в параметр передаем слушатель, чтобы мы потом могли обрабатывать нажатия из класса Activity
@@ -16,12 +16,10 @@ class FilmListRecyclerAdapter(
     private val clickListener: OnItemClickListener,
     private val longClickListener: OnItemLongClickListener,
 ) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-    private var items = listOf<Film>()
+    ListAdapter<Film, RecyclerView.ViewHolder>(FilmDiffCallback()) {
 
     //Этот метод нужно переопределить на возврат количества элементов в списке RV
-    override fun getItemCount() = items.size
+    override fun getItemCount() = currentList.size
 
     //В этом методе мы привязываем наш ViewHolder и передаем туда "надутую" верстку нашего фильма
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -34,24 +32,16 @@ class FilmListRecyclerAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is FilmViewHolder -> {
+                val item = currentList[position]
                 ViewCompat.setTransitionName(
                     holder.itemView.findViewById(R.id.poster),
-                    items[position].filmId.toString()
+                    item.filmId.toString()
                 )
                 //Вызываем метод bind(), который мы создали, и передаем туда объект
                 //из нашей базы данных с указанием позиции
-                holder.bind(items[position], clickListener, longClickListener)
+                holder.bind(item, clickListener, longClickListener)
             }
         }
-    }
-
-    fun updateData(filmsDataBase: List<Film>) {
-        val oldFilmsList = items
-        //Кладем нашу БД в RV
-        val diff = FilmDiff(oldFilmsList, filmsDataBase)
-        val diffResult = DiffUtil.calculateDiff(diff)
-        items = filmsDataBase
-        diffResult.dispatchUpdatesTo(this)
     }
 
     //Интерфейс для обработки кликов

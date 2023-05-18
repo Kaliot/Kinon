@@ -43,10 +43,12 @@ class WatchLaterFragment : Fragment() {
                             context?.let { viewModel.editAlarm(it, alarm) }
                             true
                         }
+
                         R.id.deleteAlarm -> {
                             context?.let { viewModel.cancelAlarm(it, alarm) }
                             true
                         }
+
                         else -> false
                     }
                 }
@@ -65,7 +67,7 @@ class WatchLaterFragment : Fragment() {
             //Если пришло другое значение, то кладем его в переменную
             field = value
             //Обновляем RV адаптер
-            alarmAdapter.updateData(field)
+            alarmAdapter.submitList(field)
         }
 
     init {
@@ -121,11 +123,10 @@ class WatchLaterFragment : Fragment() {
         recyclerView = binding.watchLaterRecyclerView
         recyclerView?.apply {
             //Присваиваем адаптер
-            recyclerView?.adapter = alarmAdapter
+            adapter = alarmAdapter
 
             //Присвоим layoutManager
-            val layoutManager = LinearLayoutManager(requireContext())
-            recyclerView?.layoutManager = layoutManager
+            layoutManager = LinearLayoutManager(requireContext())
 
             //Применяем декоратор для отступов
             val decorator = TopSpacingItemDecoration(DECORATOR_PADDING_IN_DP)
@@ -140,7 +141,7 @@ class WatchLaterFragment : Fragment() {
             .onErrorComplete()
             .subscribe {
                 alarmDataBase = it as MutableList<Alarm>
-                alarmAdapter.updateData(alarmDataBase)
+                alarmAdapter.submitList(alarmDataBase)
             }.addTo(autoDisposable)
     }
 

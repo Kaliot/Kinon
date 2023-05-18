@@ -6,7 +6,14 @@ import com.bolunevdev.core_api.AppProvider
 import com.bolunevdev.core_api.db.DatabaseProvider
 import com.bolunevdev.kinon.App
 import com.bolunevdev.kinon.di.modules.DomainModule
-import com.bolunevdev.kinon.viewmodel.*
+import com.bolunevdev.kinon.di.modules.InteractorModule
+import com.bolunevdev.kinon.di.modules.RepositoryModule
+import com.bolunevdev.kinon.view.activities.MainActivity
+import com.bolunevdev.kinon.viewmodel.DetailsFragmentViewModel
+import com.bolunevdev.kinon.viewmodel.FavoritesFragmentViewModel
+import com.bolunevdev.kinon.viewmodel.HomeFragmentViewModel
+import com.bolunevdev.kinon.viewmodel.SettingsFragmentViewModel
+import com.bolunevdev.kinon.viewmodel.WatchLaterFragmentViewModel
 import com.bolunevdev.remote_module.DaggerRemoteComponent
 import com.bolunevdev.remote_module.RemoteProvider
 import dagger.Component
@@ -20,7 +27,7 @@ import javax.inject.Singleton
         DatabaseProvider::class,
         RemoteProvider::class
     ],
-    modules = [DomainModule::class]
+    modules = [DomainModule::class, RepositoryModule::class, InteractorModule::class]
 )
 interface FacadeComponent {
     //метод для того, чтобы появилась внедряемые зависимости в HomeFragmentViewModel
@@ -36,6 +43,8 @@ interface FacadeComponent {
     fun inject(DetailsFragmentViewModel: DetailsFragmentViewModel)
 
     fun inject(WatchLaterFragmentViewModel: WatchLaterFragmentViewModel)
+
+    fun inject(MainActivity: MainActivity)
 
     companion object {
         fun init(application: Application): FacadeComponent =

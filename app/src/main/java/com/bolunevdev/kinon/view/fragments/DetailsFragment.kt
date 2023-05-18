@@ -92,15 +92,11 @@ class DetailsFragment : Fragment() {
     }
 
     private fun loadFilmsDataBase() {
-        viewModel.filmsListObservable
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .onErrorComplete()
-            .subscribe {
-                favoriteFilms = it as MutableList<Film>
-                initDetailsFabFavorites()
-                setFabFavoritesIcon()
-            }.addTo(autoDisposable)
+        viewModel.filmsListLiveData.observe(viewLifecycleOwner) { films ->
+            favoriteFilms = films.toMutableList()
+            initDetailsFabFavorites()
+            setFabFavoritesIcon()
+        }
     }
 
     private fun initDetailsFabFavorites() {
@@ -293,7 +289,7 @@ class DetailsFragment : Fragment() {
                 // Обрабатываем ошибку
                 Toast.makeText(
                     requireContext(),
-                    TOAST_ERROR_MESSAGE,
+                    R.string.toast_error_load_message,
                     Toast.LENGTH_SHORT
                 ).show()
             }).addTo(autoDisposable)
@@ -336,6 +332,5 @@ class DetailsFragment : Fragment() {
         private const val DOWNLOAD_PATH = "Pictures/Kinon"
         private const val PERCENT_OF_QUALITY = 100
         private const val WRITE_EXTERNAL_STORAGE_PERMISSION_CODE = 1
-        private const val TOAST_ERROR_MESSAGE = "Не удалось скачать изображение!"
     }
 }

@@ -33,4 +33,6 @@
     <string name="btn_edit_alarm">Изменить</string>
     <string name="btn_delete_alarm">Удалить</string>
     <string name="alarm_item_menu_btn_description">Alarm menu</string>
+    <string name="toast_error_load_message">Не удалось скачать изображение!</string>
+    <string name="toast_server_error_message">Не удалось получить данные с сервера!</string>
 </resources>

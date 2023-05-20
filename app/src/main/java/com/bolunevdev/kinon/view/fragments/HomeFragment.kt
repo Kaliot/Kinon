@@ -11,7 +11,6 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Fade
@@ -94,7 +93,6 @@ class HomeFragment : Fragment() {
     private var totalItemCount = DEFAULT_TOTAL_ITEM_COUNT
     private val autoDisposable = AutoDisposable()
     private var isSearchRequestEmpty: Boolean = true
-    private val isSearchRequestEmptyLiveData: MutableLiveData<Boolean> = MutableLiveData(true)
     private var searchRequest = ""
     private val searchFilmsList = mutableListOf<Film>()
     private val sharedChangeListener =
@@ -115,7 +113,7 @@ class HomeFragment : Fragment() {
             //Если пришло другое значение, то кладем его в переменную
             field = value
             //Обновляем RV адаптер
-            filmsAdapter.updateData(field)
+            filmsAdapter.submitList(field)
         }
 
     init {
@@ -156,14 +154,6 @@ class HomeFragment : Fragment() {
         setProgressBar()
 
         setServerErrorToast()
-
-        setIsSearchRequestEmpty()
-    }
-
-    private fun setIsSearchRequestEmpty() {
-        isSearchRequestEmptyLiveData.observe(viewLifecycleOwner) {
-            isSearchRequestEmpty = it
-        }
     }
 
     private fun bindAutoDisposable() {
@@ -181,13 +171,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun setServerErrorToast() {
-        viewModel.showServerError
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .onErrorComplete()
-            .subscribe {
-                if (it) Toast.makeText(context, SERVER_ERROR_MESSAGE, Toast.LENGTH_SHORT).show()
-            }.addTo(autoDisposable)
+        viewModel.showServerError.observe(viewLifecycleOwner) { shouldShowError ->
+            if (shouldShowError) {
+                Toast.makeText(context, R.string.toast_server_error_message, Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
     }
 
     private fun addSharedPreferencesListener() {
@@ -226,15 +215,15 @@ class HomeFragment : Fragment() {
             .distinctUntilChanged() //Ввод пробела не запустит повторный поиск
             .subscribeOn(Schedulers.io())
             .debounce(DEBOUNCE_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
             .filter {
+                isSearchRequestEmpty = it.isBlank()
                 if (it.isBlank()) {
                     loadFilmsDataBase()
                     isLoading = false
                 }
-                isSearchRequestEmptyLiveData.postValue(it.isBlank())
                 it.isNotBlank()
             }
-            .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 searchRequest = it
                 searchFilmsList.clear()
@@ -260,7 +249,7 @@ class HomeFragment : Fragment() {
             .subscribe({ searchedFilmsList ->
                 searchFilmsList.addAll(searchedFilmsList)
                 //Добавляем в адаптер
-                filmsAdapter.updateData(searchFilmsList.toMutableList())
+                filmsAdapter.submitList(searchFilmsList.toMutableList())
                 //Проверяем количество полученных фильмов
                 if (searchedFilmsList.size == DEFAULT_TOTAL_ITEM_COUNT) isLoading = false
             }, {
@@ -274,10 +263,9 @@ class HomeFragment : Fragment() {
 
         recyclerView?.apply {
             //Присваиваем адаптер
-            recyclerView?.adapter = filmsAdapter
+            adapter = filmsAdapter
             //Присвоим layoutManager
-            val layoutManager = LinearLayoutManager(requireContext())
-            recyclerView?.layoutManager = layoutManager
+            layoutManager = LinearLayoutManager(requireContext())
             //Применяем декоратор для отступов
             val decorator = TopSpacingItemDecoration(DECORATOR_PADDING_IN_DP)
             addItemDecoration(decorator)
@@ -299,16 +287,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadFilmsDataBase() {
-        viewModel.filmsListObservable
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .onErrorComplete()
-            .subscribe {
-                filmsDataBase = it as MutableList<Film>
-                //Загружаем, если нет поискового запроса
-                if (isSearchRequestEmpty) filmsAdapter.updateData(filmsDataBase)
-                isLoading = false
-            }.addTo(autoDisposable)
+        viewModel.filmsListLiveData.observe(viewLifecycleOwner) { films ->
+            filmsDataBase = films.toMutableList()
+            //Загружаем, если нет поискового запроса
+            if (isSearchRequestEmpty) filmsAdapter.submitList(filmsDataBase)
+            isLoading = false
+        }
     }
 
     private fun changeCategory() {
@@ -343,7 +327,6 @@ class HomeFragment : Fragment() {
         private const val DECORATOR_PADDING_IN_DP = 8
         private var isLoading: Boolean = false
         private const val DEFAULT_TOTAL_ITEM_COUNT = 20
-        private const val SERVER_ERROR_MESSAGE = "Не удалось получить данные с сервера!"
         private const val DEBOUNCE_TIMEOUT_MS = 1000L
     }
 }
